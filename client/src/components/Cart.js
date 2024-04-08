@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import './Cart.css';
 
 const Cart = () => {
- return (
+  return (
     <div className="cart-container">
       <h1>Your Cart</h1>
       <div className="cart-items">
@@ -19,10 +19,11 @@ const Cart = () => {
         {/* Add more cart items as needed */}
       </div>
       <div className="cart-actions">
-        <Link to="/Payment" className="cart-button">Proceed to Checkout</Link>
+        <Link to="/" className="cart-button">Back to Home</Link> {/* Add this line for the Back to Home button */}
+        <Link to="/payment" className="cart-button">Proceed to Checkout</Link>
       </div>
     </div>
- );
+  );
 };
 
 export default Cart;

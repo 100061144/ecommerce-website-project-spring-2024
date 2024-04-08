@@ -37,3 +37,9 @@
 .cart-button:hover {
     background-color: #0056b3;
 }
+
+.cart-actions {
+    display: flex;
+    gap: 10px; /* Adjust the gap between buttons */
+    /* Other styles */
+}

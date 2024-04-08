@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { database } from '../firebase-config';
 import { ref, get } from "firebase/database";
-import './Home.css';
+import './Profile.css';
 
 const Profile = () => {
   const [userData, setUserData] = useState({});
@@ -11,9 +11,10 @@ const Profile = () => {
   const auth = getAuth();
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        const userRef = ref(database, 'users/' + user.uid);
+        // User is signed in, fetch additional profile data
+        const userRef = ref(database, `users/${user.uid}`);
         get(userRef).then((snapshot) => {
           if (snapshot.exists()) {
             setUserData(snapshot.val());
@@ -21,12 +22,16 @@ const Profile = () => {
             console.log("No user data available");
           }
         }).catch((error) => {
-          console.error(error);
+          console.error("Error fetching user data:", error);
         });
       } else {
+        // User is signed out
         navigate('/login');
       }
     });
+
+    // Cleanup on unmount
+    return () => unsubscribe();
   }, [navigate, auth]);
 
   const handleSignOut = async () => {

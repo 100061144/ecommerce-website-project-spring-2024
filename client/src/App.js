@@ -7,6 +7,7 @@ import Payment from './components/Payment';
 import Profile from './components/Profile';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import Catalogue from './components/Catalogue'; // Make sure to import the Catalogue component
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/catalogue" element={<Catalogue />} /> {/* Add Catalogue route here */}
         </Route>
       </Routes>
     </Router>

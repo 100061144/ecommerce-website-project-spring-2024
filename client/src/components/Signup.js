@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // Ensure Link is imported here
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { ref, set } from "firebase/database"; // Import ref and set
-import { auth, database } from '../firebase-config'; // Ensure database is imported
-import './Signup.css';
+import { ref, set } from "firebase/database";
+import { auth, database } from '../firebase-config'; // Adjust the path as necessary
+import './Signup.css'; // Ensure this points to your CSS file for styling
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -34,17 +34,30 @@ const Signup = () => {
   };
 
   return (
-    <div className="home-container">
+    <div className="signup-container">
       <h1>Sign Up</h1>
-      <form onSubmit={handleSubmit} className="home-form">
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className="home-input" />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required className="home-input" />
-        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required className="home-input" />
-        <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone Number" required className="home-input" />
-        <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First Name" required className="home-input" />
-        <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Last Name" required className="home-input" />
-        <button type="submit" className="home-button">Sign Up</button>
+      <form onSubmit={handleSubmit} className="signup-form">
+        <label className="signup-label">Email:</label>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="signup-input" />
+        
+        <label className="signup-label">Password:</label>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="signup-input" />
+        
+        <label className="signup-label">Username:</label>
+        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required className="signup-input" />
+        
+        <label className="signup-label">Phone Number:</label>
+        <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} required className="signup-input" />
+        
+        <label className="signup-label">First Name:</label>
+        <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required className="signup-input" />
+        
+        <label className="signup-label">Last Name:</label>
+        <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required className="signup-input" />
+        
+        <button type="submit" className="signup-button">Sign Up</button>
       </form>
+      <Link to="/login" className="back-to-login-link">Back to Login</Link> {/* Back to Login button */}
     </div>
   );
 };
