@@ -1,0 +1,11 @@
+{
+  "users": {
+    "userId1": {
+      "email": "user1@example.com",
+      "username": "user1",
+      "firstName": "First",
+      "lastName": "User",
+      "phone": "1234567890"
+    }
+  }
+}

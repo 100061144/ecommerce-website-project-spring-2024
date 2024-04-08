@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Import Link along with useNavigate
+import { useNavigate, Link } from 'react-router-dom';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../firebase-config';
-import './Home.css'; // Assuming you're using Home.css for styling
+import './Login.css';
 
 const Login = () => {
- const [email, setEmail] = useState('');
- const [password, setPassword] = useState('');
- const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const auth = getAuth();
 
- const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
@@ -18,9 +18,9 @@ const Login = () => {
     } catch (error) {
       alert(error.message);
     }
- };
+  };
 
- return (
+  return (
     <div className="home-container">
       <h1>Login</h1>
       <form onSubmit={handleSubmit} className="home-form">
@@ -29,10 +29,10 @@ const Login = () => {
         <button type="submit" className="home-button">Login</button>
       </form>
       <div className="home-buttons">
-        <Link to="/signup" className="home-button">Sign Up</Link> {/* Add this line for the Sign Up button */}
+        <Link to="/signup" className="home-button">Don't have an account? Sign Up</Link>
       </div>
     </div>
- );
+  );
 };
 
 export default Login;

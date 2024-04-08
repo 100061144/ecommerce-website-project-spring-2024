@@ -7,7 +7,7 @@ import Payment from './components/Payment';
 import Profile from './components/Profile';
 import Login from './components/Login';
 import Signup from './components/Signup';
-import ProtectedRoute from './components/ProtectedRoute'; // Make sure to import ProtectedRoute
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -15,10 +15,12 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-        <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-        <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
       </Routes>
     </Router>
   );

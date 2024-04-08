@@ -6,38 +6,37 @@
   flex-direction: column;
   min-height: 100vh;
   background-color: #f5f5f5;
- }
- 
- /* Navigation bar */
- .nav-bar {
+}
+
+/* Navigation bar */
+.nav-bar {
   background-color: #333;
   color: white;
   padding: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
- }
- 
- .nav-bar a {
+}
+
+.nav-bar a {
   color: white;
   text-decoration: none;
   margin-right: 15px;
- }
- 
- .nav-bar a:hover {
+}
+
+.nav-bar a:hover {
   color: #ddd;
- }
- 
- /* Main content area */
- .main-content {
+}
+
+/* Main content area */
+.main-content {
   flex-grow: 1;
   padding: 20px;
- }
- 
- /* Optional: Add some basic styling for the body to ensure the app takes up the full viewport height */
- body {
+}
+
+/* Optional: Add some basic styling for the body to ensure the app takes up the full viewport height */
+body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
- }
- 
+}
