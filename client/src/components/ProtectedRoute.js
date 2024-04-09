@@ -1,26 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useState, useEffect } from "react";
 
 const ProtectedRoute = () => {
-  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const auth = getAuth();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/isAuthenticated'); // Adjust the URL/port as necessary
+        const data = await response.json();
+        setIsAuthenticated(data.isAuthenticated);
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+        // Handle error (e.g., set isAuthenticated to false)
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    });
+    };
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, [auth]);
+    checkAuth();
+  }, []);
 
   if (isLoading) {
     return <div>Loading...</div>; // Or any other loading indicator

@@ -1,38 +1,71 @@
+// server.js
+
 const express = require('express');
+const cors = require('cors'); // Import the cors package
+const bodyParser = require('body-parser');
+const { authenticateUser } = require('./routes/auth');
 const fs = require('fs');
 const path = require('path');
-const bodyParser = require('body-parser');
+const util = require('util');
+
+// Convert fs.readFile into Promise version of same    
+const readFile = util.promisify(fs.readFile);
+
+async function checkAuthentication(username, password) {
+    try {
+        const filePath = path.join(__dirname, 'data', 'users.txt');
+        const data = await readFile(filePath, 'utf8');
+        const lines = data.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const [fileUsername, filePassword] = line.split('\t');
+            if (fileUsername === username && filePassword === password) {
+                // If it's the first line, treat the user as an admin
+                const isAdmin = (i === 0);
+                return { success: true, isAdmin };
+            }
+        }
+
+        return { success: false };
+    } catch (error) {
+        console.error("Error reading the users file:", error);
+        throw error; // Rethrow or handle as needed
+    }
+}
 
 const app = express();
-const PORT = 3000;
 
+// Use cors middleware to enable CORS
+app.use(cors());
+
+// Use bodyParser middleware to parse JSON bodies
 app.use(bodyParser.json());
 
-app.post('/login', (req, res) => {
+// Login endpoint
+app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    const filePath = path.join(__dirname, 'username.txt');
-    const data = fs.readFileSync(filePath, 'utf8');
-    const lines = data.trim().split('\n');
-   
-    for (let line of lines) {
-      const userDetails = line.split('\t');
-      if (userDetails[0] === username && userDetails[1] === password) {
-        // Constructing user object from userDetails array
-        const user = {
-          username: userDetails[0],
-          password: userDetails[1], // Including password as per your requirement
-          email: userDetails[2],
-          phone_number: userDetails[3],
-          first_name: userDetails[4],
-          last_name: userDetails[5]
-        };
-        return res.json({ user });
-      }
+    try {
+        const authResult = await checkAuthentication(username, password);
+        if (authResult.success) {
+            // Include the isAdmin flag in the response
+            res.json({ success: true, message: "Authentication successful", isAdmin: authResult.isAdmin });
+        } else {
+            res.status(401).json({ success: false, message: "Invalid credentials" });
+        }
+    } catch (error) {
+        console.error("Error during authentication:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
-   
-    return res.status(401).json({ message: "Invalid credentials" });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.get('/isAuthenticated', (req, res) => {
+    // This is a simplified example. You should secure this endpoint.
+    const isAuthenticated = checkAuthentication(); // Implement this function based on your .txt file logic
+    res.json({ isAuthenticated });
 });
+
+// Define the port number
+const PORT = 3000;
+// Start the server
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

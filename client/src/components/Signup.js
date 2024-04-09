@@ -1,35 +1,33 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Ensure Link is imported here
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { ref, set } from "firebase/database";
-import { auth, database } from '../firebase-config'; // Adjust the path as necessary
-import './Signup.css'; // Ensure this points to your CSS file for styling
+import { useNavigate } from 'react-router-dom';
+import './Signup.css'; // Adjust the path as necessary
 
 const Signup = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [phone, setPhone] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [password, setPassword] = useState('');
+  // Add other state variables as necessary
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      // Save the additional user info to your database
-      set(ref(database, `users/${userCredential.user.uid}`), {
-        email,
-        username,
-        phone,
-        firstName,
-        lastName
+      const response = await fetch('http://localhost:3000/signup', { // Ensure URL matches your server
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, username, password /*, other fields */ }),
       });
-      alert("User created successfully!");
-      navigate('/'); // Redirect to the home page
+      const data = await response.json();
+      if (data.success) {
+        alert("User created successfully!");
+        navigate('/login'); // Redirect to the login page
+      } else {
+        alert(data.message); // Show error message from server
+      }
     } catch (error) {
-      alert(error.message);
+      alert("An error occurred during signup.");
     }
   };
 
@@ -37,27 +35,12 @@ const Signup = () => {
     <div className="signup-container">
       <h1>Sign Up</h1>
       <form onSubmit={handleSubmit} className="signup-form">
-        <label className="signup-label">Email:</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="signup-input" />
-        
-        <label className="signup-label">Password:</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="signup-input" />
-        
-        <label className="signup-label">Username:</label>
-        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required className="signup-input" />
-        
-        <label className="signup-label">Phone Number:</label>
-        <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} required className="signup-input" />
-        
-        <label className="signup-label">First Name:</label>
-        <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required className="signup-input" />
-        
-        <label className="signup-label">Last Name:</label>
-        <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required className="signup-input" />
-        
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="signup-input" placeholder="Email" />
+        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required className="signup-input" placeholder="Username" />
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="signup-input" placeholder="Password" />
+        {/* Include other input fields as necessary */}
         <button type="submit" className="signup-button">Sign Up</button>
       </form>
-      <Link to="/login" className="back-to-login-link">Back to Login</Link> {/* Back to Login button */}
     </div>
   );
 };

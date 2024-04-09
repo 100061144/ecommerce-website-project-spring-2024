@@ -1,0 +1,35 @@
+/* Assuming your Home.css uses a flex layout for buttons, we'll do the same here */
+.admin-dashboard-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .admin-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Provides space between buttons */
+    margin-top: 20px;
+  }
+  
+  .admin-button {
+    background-color: #007bff; /* A nice blue, similar to Bootstrap's primary color */
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  
+    /* Assuming your home buttons grow slightly on hover */
+    font-size: 16px; /* Adjust size as needed */
+  }
+  
+  .admin-button:hover {
+    background-color: #0056b3; /* A darker shade of blue for hover effect */
+  }
+  
+  /* If you have a specific font-family or other global styles applied to your Home page, consider applying them here as well */
