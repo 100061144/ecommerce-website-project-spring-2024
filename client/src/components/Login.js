@@ -1,34 +1,39 @@
+// Login.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Login.css'; // Adjust the path as necessary
+import { useNavigate, Link } from 'react-router-dom';
+import './Login.css'; // Ensure this path matches your CSS file's location
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
+  // Login.js
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3000/login', { // Ensure URL matches your server
+      const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
       const data = await response.json();
-      console.log(data); // Log the response for debugging
       if (data.success) {
-        console.log("Is Admin:", data.isAdmin); // Check the isAdmin value
+        // Store user information in localStorage
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('email', data.email);
+        localStorage.setItem('phoneNumber', data.phoneNumber);
+        localStorage.setItem('firstName', data.firstName);
+        localStorage.setItem('lastName', data.lastName);
+
+        // Redirect based on isAdmin flag
         if (data.isAdmin) {
-          navigate('/admin'); // Navigate to the admin dashboard
+          navigate('/admin'); // Redirect to AdminDashboard for admin
         } else {
-          console.log('Navigating to home page');
-          navigate('/'); // Navigate to the home page for regular users
+          navigate('/'); // Redirect to homepage or user dashboard for regular users
         }
       } else {
-        alert(data.message); // Show error message from server
+        alert(data.message); // Handle login failure
       }
     } catch (error) {
       console.error("An error occurred during login:", error);
@@ -44,6 +49,7 @@ const Login = () => {
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required className="login-input" />
         <button type="submit" className="login-button">Login</button>
       </form>
+      <button onClick={() => navigate('/signup')} className="login-button">Sign Up</button>
     </div>
   );
 };

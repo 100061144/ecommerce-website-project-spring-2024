@@ -1,28 +1,40 @@
-// AdminDashboard.js
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import './AdminDashboard.css'; // Make sure you have this CSS file created based on the previous instructions
-import './AdminDashboard.css'; // Assuming you have or will create a separate CSS file for admin styles
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './AdminDashboard.css'; // Make sure the path to your CSS file is correct
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [displaySection, setDisplaySection] = useState('');
 
+  // Function to handle displaying different sections based on the button clicked
+  const handleDisplaySection = (section) => {
+    setDisplaySection(section);
+  };
+
+  // Function to handle the sign-out process
   const handleSignOut = () => {
-    // Clear user session from local storage or any state management you are using
-    localStorage.removeItem('user');
-    // Redirect to the login page or home page
-    navigate('/login');
+    localStorage.clear(); // Clear all stored data in localStorage
+    navigate('/login'); // Redirect the user to the login page
   };
 
   return (
-    <div className="admin-dashboard-container">
-      <h1>Admin Dashboard</h1>
+    <div className="admin-dashboard">
+      <h1>Admin Dashboard</h1> {/* Title of the Admin Dashboard */}
       <div className="admin-buttons">
-        <Link to="/admin/products" className="admin-button">Manage Products</Link>
-        <Link to="/admin/users" className="admin-button">Manage Users</Link>
-        <Link to="/admin/orders" className="admin-button">Manage Orders</Link>
-        <Link to="/admin/analytics" className="admin-button">View Analytics</Link>
-        <button onClick={handleSignOut} className="admin-button">Sign Out</button> {/* Sign out button */}
+        {/* Buttons for different admin actions */}
+        <button onClick={() => handleDisplaySection('products')} className="admin-button">Manage Products</button>
+        <button onClick={() => handleDisplaySection('users')} className="admin-button">Manage Users</button>
+        <button onClick={() => handleDisplaySection('orders')} className="admin-button">Manage Orders</button>
+        <button onClick={() => handleDisplaySection('analytics')} className="admin-button">View Analytics</button>
+        <button onClick={handleSignOut} className="admin-sign-out-button">Sign Out</button>
+      </div>
+      <div className="admin-content">
+        {/* Conditional rendering based on the selected section */}
+        {displaySection === 'products' && <div>Products Management Section</div>}
+        {displaySection === 'users' && <div>Users Management Section</div>}
+        {displaySection === 'orders' && <div>Orders Management Section</div>}
+        {displaySection === 'analytics' && <div>Analytics View Section</div>}
+        {/* Replace the above divs with your actual components or data display logic */}
       </div>
     </div>
   );

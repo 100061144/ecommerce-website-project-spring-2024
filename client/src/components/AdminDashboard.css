@@ -1,35 +1,42 @@
-/* Assuming your Home.css uses a flex layout for buttons, we'll do the same here */
-.admin-dashboard-container {
+.admin-dashboard {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
   }
   
   .admin-buttons {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px; /* Provides space between buttons */
-    margin-top: 20px;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .admin-button, .admin-sign-out-button {
+    font-size: 18px; /* Adjust the font size as needed */
+    padding: 20px 30px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .admin-button:hover, .admin-sign-out-button:hover {
+    transform: scale(1.05);
   }
   
   .admin-button {
-    background-color: #007bff; /* A nice blue, similar to Bootstrap's primary color */
+    background-color: #007bff;
     color: white;
-    text-decoration: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  
-    /* Assuming your home buttons grow slightly on hover */
-    font-size: 16px; /* Adjust size as needed */
   }
   
   .admin-button:hover {
-    background-color: #0056b3; /* A darker shade of blue for hover effect */
+    background-color: #0056b3;
   }
   
-  /* If you have a specific font-family or other global styles applied to your Home page, consider applying them here as well */
+  .admin-sign-out-button {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .admin-sign-out-button:hover {
+    background-color: #c82333;
+  }

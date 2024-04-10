@@ -28,7 +28,7 @@
     margin-bottom: 10px;
 }
 
-.profile-logout-button {
+.profile-sign-out-button {
     padding: 10px 20px;
     background-color: #dc3545;
     color: white;
@@ -38,6 +38,20 @@
     transition: background-color 0.3s ease;
 }
 
-.profile-logout-button:hover {
+.profile-sign-out-button:hover {
     background-color: #c82330;
+}
+
+.edit-profile-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.edit-profile-button:hover {
+    background-color: #007bff;
 }

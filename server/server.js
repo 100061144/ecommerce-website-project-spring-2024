@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors'); // Import the cors package
 const bodyParser = require('body-parser');
 const { authenticateUser } = require('./routes/auth');
+const { getUserData } = require('./routes/auth');
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
@@ -45,18 +46,27 @@ app.use(bodyParser.json());
 // Login endpoint
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    try {
-        const authResult = await checkAuthentication(username, password);
-        if (authResult.success) {
-            // Include the isAdmin flag in the response
-            res.json({ success: true, message: "Authentication successful", isAdmin: authResult.isAdmin });
-        } else {
-            res.status(401).json({ success: false, message: "Invalid credentials" });
-        }
-    } catch (error) {
-        console.error("Error during authentication:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+    const result = authenticateUser(username, password);
+    if (result.success) {
+      res.json(result); // Ensure this includes username, email, phoneNumber, firstName, lastName
+    } else {
+      res.status(401).json({ success: false, message: "Invalid credentials" });
     }
+});
+
+app.post('/signup', (req, res) => {
+const { username, password, email, phoneNumber, firstName, lastName } = req.body;
+const newUserLine = `${username}\t${password}\t${email}\t${phoneNumber}\t${firstName}\t${lastName}\n`;
+
+const filePath = path.join(__dirname, 'data', 'users.txt'); // Adjust the path to your users.txt file
+
+fs.appendFile(filePath, newUserLine, (err) => {
+    if (err) {
+    console.error('Failed to append new user to file:', err);
+    return res.status(500).send('Error signing up the user.');
+    }
+    res.status(200).send('User signed up successfully.');
+});
 });
 
 app.get('/isAuthenticated', (req, res) => {
@@ -64,6 +74,19 @@ app.get('/isAuthenticated', (req, res) => {
     const isAuthenticated = checkAuthentication(); // Implement this function based on your .txt file logic
     res.json({ isAuthenticated });
 });
+
+app.get('/profile/:username', (req, res) => {
+  const { username } = req.params;
+  const userData = getUserData(username);
+
+  if (userData) {
+    res.json({ success: true, userData });
+  } else {
+    res.status(404).json({ success: false, message: 'User not found' });
+  }
+});
+
+
 
 // Define the port number
 const PORT = 3000;
