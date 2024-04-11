@@ -6,7 +6,7 @@ const Payment = () => {
   const [paymentDetails, setPaymentDetails] = useState({
     cardNumber: '',
     expiryDate: '',
-    ccv: ''
+    cvv: ''
   });
 
   const navigate = useNavigate();
@@ -39,8 +39,8 @@ const Payment = () => {
           <input type="text" id="expiryDate" name="expiryDate" value={paymentDetails.expiryDate} onChange={handleChange} placeholder="MM/YY" required />
         </div>
         <div className="form-group">
-          <label htmlFor="ccv">CCV:</label>
-          <input type="text" id="ccv" name="ccv" value={paymentDetails.ccv} onChange={handleChange} required />
+          <label htmlFor="cvv">CVV:</label>
+          <input type="text" id="cvv" name="cvv" value={paymentDetails.cvv} onChange={handleChange} required />
         </div>
         <button type="submit" className="confirm-payment-button">Confirm Payment</button>
       </form>

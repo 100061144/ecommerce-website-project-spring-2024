@@ -11,6 +11,7 @@ const util = require('util');
 
 // Convert fs.readFile into Promise version of same    
 const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
 
 async function checkAuthentication(username, password) {
     try {
@@ -32,6 +33,42 @@ async function checkAuthentication(username, password) {
     } catch (error) {
         console.error("Error reading the users file:", error);
         throw error; // Rethrow or handle as needed
+    }
+}
+
+async function updateUserProfile(originalUsername, updates) {
+    const filePath = path.join(__dirname, 'data', 'users.txt');
+    try {
+        const data = await readFile(filePath, 'utf8');
+        const lines = data.split('\n');
+        let fileUpdated = false;
+
+        const updatedLines = lines.map(line => {
+            const [username, password, email, phoneNumber, firstName, lastName] = line.split('\t');
+            if (username === originalUsername) {
+                fileUpdated = true;
+                // Update each field if it's provided in the updates object, otherwise keep the original
+                return [
+                    updates.newUsername || username,
+                    updates.newPassword || password,
+                    updates.email || email,
+                    updates.phoneNumber || phoneNumber,
+                    updates.firstName || firstName,
+                    updates.lastName || lastName,
+                ].join('\t');
+            }
+            return line;
+        });
+
+        if (!fileUpdated) {
+            return { success: false, message: "User not found." };
+        }
+
+        await writeFile(filePath, updatedLines.join('\n'), 'utf8');
+        return { success: true, message: "Profile updated successfully." };
+    } catch (error) {
+        console.error("Error updating user profile:", error);
+        return { success: false, message: "Error updating user profile." };
     }
 }
 
@@ -86,7 +123,64 @@ app.get('/profile/:username', (req, res) => {
   }
 });
 
+app.post('/updateProfile', async (req, res) => {
+    const { originalUsername, ...updates } = req.body;
+    const result = await updateUserProfile(originalUsername, updates);
+    res.json(result);
+});
 
+app.delete('/deleteAccount', async (req, res) => {
+  const { username } = req.body; // Assuming the username is sent in the request body
+
+  const filePath = path.join(__dirname, 'data', 'users.txt');
+  try {
+      const data = await readFile(filePath, 'utf8');
+      const lines = data.split('\n');
+      const updatedLines = lines.filter(line => {
+          const [fileUsername] = line.split('\t');
+          return fileUsername !== username;
+      });
+
+      await writeFile(filePath, updatedLines.join('\n'), 'utf8');
+      res.json({ success: true, message: "Account deleted successfully." });
+  } catch (error) {
+      console.error("Error deleting user account:", error);
+      res.status(500).json({ success: false, message: "Error deleting user account." });
+  }
+});
+
+app.get('/users', (req, res) => {
+  const filePath = path.join(__dirname, 'data', 'users.txt');
+  fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+          console.error("Failed to read users file:", err);
+          return res.status(500).json({ success: false, message: "Failed to read users data" });
+      }
+
+      const users = data.trim().split('\n').map(line => {
+          const [username, , email, phoneNumber, firstName, lastName] = line.split('\t');
+          return { username, email, phoneNumber, firstName, lastName };
+      });
+
+      res.json({ success: true, users });
+  });
+});
+
+app.delete('/deleteUser', async (req, res) => {
+  const { username } = req.body; // The username of the user to delete
+
+  const filePath = path.join(__dirname, 'data', 'users.txt');
+  try {
+      const data = await fs.promises.readFile(filePath, 'utf8');
+      const lines = data.split('\n');
+      const filteredLines = lines.filter(line => line.split('\t')[0] !== username);
+      await fs.promises.writeFile(filePath, filteredLines.join('\n'), 'utf8');
+      res.json({ success: true, message: "User deleted successfully." });
+  } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ success: false, message: "Error deleting user." });
+  }
+});
 
 // Define the port number
 const PORT = 3000;

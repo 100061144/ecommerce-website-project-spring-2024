@@ -1,42 +1,109 @@
-.admin-dashboard {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .admin-buttons {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  
-  .admin-button, .admin-sign-out-button {
-    font-size: 18px; /* Adjust the font size as needed */
-    padding: 20px 30px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-  }
-  
-  .admin-button:hover, .admin-sign-out-button:hover {
-    transform: scale(1.05);
-  }
-  
-  .admin-button {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .admin-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .admin-sign-out-button {
-    background-color: #dc3545;
-    color: white;
-  }
-  
-  .admin-sign-out-button:hover {
-    background-color: #c82333;
-  }
+/* Profile.css */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+  font-family: Arial, sans-serif;
+}
+
+.profile-details, .profile-edit-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  margin: 20px 0;
+}
+
+.form-field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.profile-edit-form label {
+  font-weight: bold;
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+.profile-edit-form input,
+.profile-edit-form select,
+.profile-edit-form textarea {
+  flex-grow: 1;
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.profile-edit-form input:focus,
+.profile-edit-form select:focus,
+.profile-edit-form textarea:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.profile-sign-out-button, .delete-account-button, .edit-profile-button, .profile-edit-form button, .back-button, .profile-save-button {
+  padding: 10px 20px;
+  margin-top: 10px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for color and scale */
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Reintroducing transform scale on hover for all buttons */
+.profile-sign-out-button:hover, .delete-account-button:hover, .edit-profile-button:hover, .profile-edit-form button:hover, .back-button:hover, .profile-save-button:hover {
+  transform: scale(1.05); /* Scale effect for animation */
+}
+
+.delete-account-button {
+  background-color: #dc3545;
+}
+
+.delete-account-button:hover {
+  background-color: #c82330;
+}
+
+.profile-sign-out-button {
+  background-color: #007bff;
+}
+
+.profile-sign-out-button:hover {
+  background-color: #0056b3;
+}
+
+.edit-profile-button, .profile-edit-form button {
+  background-color: #ffc107;
+}
+
+.edit-profile-button:hover, .profile-edit-form button:hover {
+  background-color: #e0a800;
+}
+
+.back-button {
+  background-color: #007bff;
+}
+
+.back-button:hover {
+  background-color: #0056b3;
+}
+
+.profile-save-button {
+  background-color: #28a745;
+}
+
+.profile-save-button:hover {
+  background-color: #218838;
+}

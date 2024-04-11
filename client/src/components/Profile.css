@@ -9,7 +9,7 @@
     font-family: Arial, sans-serif;
 }
 
-.profile-details {
+.profile-details, .profile-edit-form {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -20,17 +20,17 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.profile-details p, .profile-logout-button {
-    font-family: inherit; /* Ensure buttons inherit the font */
+.profile-details p, .profile-logout-button, .profile-edit-form label {
+    font-family: inherit; /* Ensure labels inherit the font */
 }
 
-.profile-details p {
+.profile-details p, .profile-edit-form input, .profile-edit-form select, .profile-edit-form textarea {
     margin-bottom: 10px;
 }
 
-.profile-sign-out-button {
+.profile-sign-out-button, .delete-account-button, .edit-profile-button, .profile-edit-form button {
     padding: 10px 20px;
-    background-color: #dc3545;
+    margin-top: 10px;
     color: white;
     border: none;
     border-radius: 5px;
@@ -38,13 +38,50 @@
     transition: background-color 0.3s ease;
 }
 
-.profile-sign-out-button:hover {
+.delete-account-button {
+    background-color: #dc3545;
+}
+
+.delete-account-button:hover {
     background-color: #c82330;
 }
 
-.edit-profile-button {
-    padding: 10px 20px;
+.profile-sign-out-button {
     background-color: #007bff;
+}
+
+.profile-sign-out-button:hover {
+    background-color: #0056b3;
+}
+
+.edit-profile-button, .profile-edit-form button {
+    background-color: #ffc107;
+}
+
+.edit-profile-button:hover, .profile-edit-form button:hover {
+    background-color: #e0a800;
+}
+
+/* Additional styles for inputs and labels within the edit form for consistency */
+.profile-edit-form input,
+.profile-edit-form select,
+.profile-edit-form textarea {
+    width: 100%; /* Full-width inputs */
+    padding: 12px 20px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Make sure padding doesn't affect the final width */
+}
+
+.profile-edit-form label {
+    font-weight: bold; /* Make labels bold */
+}
+
+/* Style adjustments for the back button to match other buttons */
+.back-button, .profile-save-button {
+    padding: 10px 20px;
+    margin-top: 10px;
     color: white;
     border: none;
     border-radius: 5px;
@@ -52,6 +89,19 @@
     transition: background-color 0.3s ease;
 }
 
-.edit-profile-button:hover {
+.profile-save-button {
+    background-color: #28a745;
+}
+
+.profile-save-button:hover {
+    background-color: #218838;
+}
+
+.back-button {
     background-color: #007bff;
 }
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+

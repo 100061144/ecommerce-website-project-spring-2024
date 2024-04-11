@@ -2,4 +2,3 @@ admin	admin123	admin@admin.com	0501234567	Admin	Admin
 John	p@s$w0rD	john.doe@gmail.com	0509273774	John	Doe
 100061144	!!Z99699Z99v!!	100061144@ku.ac.ae	0557722050	Saif	Alafeefi
 test	test	test@gmail.com	0501234567	test	test
-test2	test2	test2@gmail.com	050112233445	test2	test2
