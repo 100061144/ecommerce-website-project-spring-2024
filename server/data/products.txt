@@ -1,0 +1,11 @@
+101-019	Pencil	5	13
+This pencil is good for writing notes!
+
+101-184	Water	2	25
+This water is good for hydrating!
+
+101-194	Cola	3	15
+This cola is good for accelerating bone deficiency!
+
+101-164	Headphones	50	5
+These headphones make you forget about existance itself!

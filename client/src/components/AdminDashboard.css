@@ -1,109 +1,125 @@
-/* Profile.css */
-.profile-container {
+/* AdminDashboard.css */
+.admin-dashboard {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: #f5f5f5;
-  font-family: Arial, sans-serif;
-}
-
-.profile-details, .profile-edit-form {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 400px;
+  justify-content: start;
   padding: 20px;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-  margin: 20px 0;
 }
 
-.form-field {
+.admin-buttons {
   display: flex;
-  align-items: center;
-  margin-bottom: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.profile-edit-form label {
-  font-weight: bold;
-  margin-right: 10px;
-  white-space: nowrap;
-}
-
-.profile-edit-form input,
-.profile-edit-form select,
-.profile-edit-form textarea {
-  flex-grow: 1;
-  padding: 12px 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-}
-
-.profile-edit-form input:focus,
-.profile-edit-form select:focus,
-.profile-edit-form textarea:focus {
-  border-color: #80bdff;
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-}
-
-.profile-sign-out-button, .delete-account-button, .edit-profile-button, .profile-edit-form button, .back-button, .profile-save-button {
+.admin-button {
   padding: 10px 20px;
-  margin-top: 10px;
+  margin: 5px;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-button:hover {
+  background-color: #0056b3;
+}
+
+.admin-sign-out-button {
+  padding: 10px 20px;
+  margin: 5px;
+  color: white;
+  background-color: #dc3545; /* Red background color */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-sign-out-button:hover {
+  background-color: #c82330; /* Darker red on hover */
+}
+
+.admin-content {
+  display: flex;
+  width: 100%;
+  max-width: 1200px; /* Adjust based on your preference */
+}
+
+.user-list {
+  flex: 0 0 250px; /* Adjust width as needed, prevents growing */
+  height: 400px; /* Adjust height as needed */
+  overflow-y: auto; /* Enables vertical scrolling */
+  padding: 10px;
+  margin-right: 20px; /* Adds some space between the list and the details */
+  border-right: 1px solid #ccc; /* Adds a visual separation */
+}
+
+.user-item {
+  margin: 5px 0; /* Adjusted for vertical spacing */
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.details-button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  background-color: #ffc107;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.details-button:hover {
+  background-color: #e0a800;
+}
+
+.delete-user-button {
+  padding: 10px 20px;
+  background-color: #dc3545;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for color and scale */
-  font-size: 16px;
-  font-weight: 500;
 }
 
-/* Reintroducing transform scale on hover for all buttons */
-.profile-sign-out-button:hover, .delete-account-button:hover, .edit-profile-button:hover, .profile-edit-form button:hover, .back-button:hover, .profile-save-button:hover {
-  transform: scale(1.05); /* Scale effect for animation */
-}
-
-.delete-account-button {
-  background-color: #dc3545;
-}
-
-.delete-account-button:hover {
+.delete-user-button:hover {
   background-color: #c82330;
 }
 
-.profile-sign-out-button {
-  background-color: #007bff;
+.user-details {
+  flex: 1; /* Allows the details section to fill the remaining space */
+  padding: 20px;
+  background-color: #f9f9f9; /* Light background for the details area */
+  border-radius: 8px; /* Rounded corners for the details box */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+  margin-left: 20px; /* Ensures some space between the list and details */
 }
 
-.profile-sign-out-button:hover {
-  background-color: #0056b3;
+.user-details p {
+  margin: 10px 0; /* Adds vertical spacing between paragraphs */
+  line-height: 1.6; /* Improves readability */
+  color: #333; /* Darker text for better contrast */
 }
 
-.edit-profile-button, .profile-edit-form button {
-  background-color: #ffc107;
+.user-details .detail-heading {
+  font-size: 18px; /* Larger font size for headings */
+  font-weight: bold; /* Bold font weight for headings */
+  color: #007bff; /* Color to match the buttons, for consistency */
+  margin-bottom: 5px; /* Space between heading and content */
 }
 
-.edit-profile-button:hover, .profile-edit-form button:hover {
-  background-color: #e0a800;
-}
-
-.back-button {
-  background-color: #007bff;
-}
-
-.back-button:hover {
-  background-color: #0056b3;
-}
-
-.profile-save-button {
-  background-color: #28a745;
-}
-
-.profile-save-button:hover {
-  background-color: #218838;
+.delete-user-button {
+  display: block; /* Makes the button take the full width */
+  width: 100%; /* Full width of the container */
+  margin-top: 20px; /* Adds space above the delete button */
+  padding: 10px 0; /* Larger padding for easier clickability */
+  font-size: 16px; /* Larger font size for the button text */
 }

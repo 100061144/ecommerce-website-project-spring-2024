@@ -1,0 +1,74 @@
+/* ProductList.css */
+
+.product-list-container {
+    display: flex;
+    flex-direction: column; /* Keep the column layout for overall alignment */
+    align-items: center; /* Center items horizontally */
+    padding: 10px; /* Adjust as needed */
+}
+
+/* Use a grid layout for the products */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Create 3 columns of equal width */
+    gap: 20px; /* Adjust the gap between grid items */
+    width: 100%; /* Adjust based on your preference */
+    max-width: 1200px; /* Maximum width of the grid */
+    align-items: center; /* Center items horizontally */
+    padding: 10px; /* Adjust as needed */
+}
+
+.product-item {
+    /* Adjustments for individual product items */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    /* Add any additional styling here */
+}
+
+.back-to-home-button {
+    padding: 10px 20px;
+    margin: 20px auto; /* Center the button horizontally */
+    display: block; /* Make the button a block element */
+    color: white;
+    background-color: #007bff; /* Adjust color to match your theme */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.back-to-home-button:hover {
+    background-color: #0056b3; /* Adjust hover color to match your theme */
+}
+
+.product-title {
+    font-size: 18px;
+    color: #333; /* Text color for readability */
+}
+
+.view-details-button, .add-to-cart-button, .back-button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    color: white;
+    background-color: #007bff; /* Button color consistent with theme */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.view-details-button:hover, .add-to-cart-button:hover, .back-button:hover {
+    background-color: #0056b3; /* Hover effect consistent with theme */
+}
+
+.product-image {
+    width: 100%; /* Adjust as needed */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 10px; /* Space between image and product title */
+}
+
+.product-image-large {
+    width: 50%; /* Larger size for the product details view */
+    height: auto; /* Maintain aspect ratio */
+    display: block; /* Ensure it's a block element */
+    margin: 0 auto 20px; /* Center the image and add space below */
+}

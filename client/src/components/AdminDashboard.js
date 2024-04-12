@@ -100,11 +100,16 @@ const AdminDashboard = () => {
             </div>
             {selectedUser && (
               <div className="user-details">
-                <p>Username: {selectedUser.username}</p>
-                <p>Email: {selectedUser.email}</p>
-                <p>Phone Number: {selectedUser.phoneNumber}</p>
-                <p>First Name: {selectedUser.firstName}</p>
-                <p>Last Name: {selectedUser.lastName}</p>
+                <p className="detail-heading">Username:</p>
+                <p>{selectedUser.username}</p>
+                <p className="detail-heading">Email:</p>
+                <p>{selectedUser.email}</p>
+                <p className="detail-heading">Phone Number:</p>
+                <p>{selectedUser.phoneNumber}</p>
+                <p className="detail-heading">First Name:</p>
+                <p>{selectedUser.firstName}</p>
+                <p className="detail-heading">Last Name:</p>
+                <p>{selectedUser.lastName}</p>
                 <button onClick={() => handleDeleteUser(selectedUser.username)} className="delete-user-button">Delete User</button>
               </div>
             )}

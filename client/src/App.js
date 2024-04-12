@@ -9,6 +9,8 @@ import Signup from './components/Signup';
 import Catalogue from './components/Catalogue';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './components/AdminDashboard';
+import ProductList from './components/ProductList';
+
 
 function App() {
   return (
@@ -24,6 +26,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/catalogue" element={<Catalogue />} />
           <Route path="/admin" element={<AdminDashboard />} /> {/* Add the route for the AdminDashboard */}
+          <Route path="/products" element={<ProductList />} />
           {/* You can add more admin-specific routes here */}
         </Route>
       </Routes>

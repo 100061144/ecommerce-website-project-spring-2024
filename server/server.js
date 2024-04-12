@@ -8,10 +8,12 @@ const { getUserData } = require('./routes/auth');
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
+const getUserCartFilePath = (username) => path.join(__dirname, 'data', `${username}'s Cart Details.txt`);
 
 // Convert fs.readFile into Promise version of same    
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
+const productsFilePath = path.join(__dirname, 'data', 'products.txt');
 
 async function checkAuthentication(username, password) {
     try {
@@ -69,6 +71,76 @@ async function updateUserProfile(originalUsername, updates) {
     } catch (error) {
         console.error("Error updating user profile:", error);
         return { success: false, message: "Error updating user profile." };
+    }
+}
+
+async function getProducts() {
+    try {
+        const data = await readFile(productsFilePath, 'utf8');
+        const products = data.trim().split('\n\n').map(productBlock => {
+            const [line1, description] = productBlock.split('\n');
+            const [id, name, price, quantity] = line1.split('\t');
+            return { id, name, price, quantity, description };
+        });
+        return products;
+    } catch (error) {
+        console.error("Error reading the products file:", error);
+        throw error;
+    }
+}
+
+async function addItemToCart(username, item) {
+    const filePath = getUserCartFilePath(username);
+    try {
+        let fileContent = "";
+        let cartItems = [];
+        const userCartExists = fs.existsSync(filePath);
+
+        if (userCartExists) {
+            fileContent = await fs.promises.readFile(filePath, 'utf8');
+            const lines = fileContent.trim().split('\n').slice(1); // Skip the first line containing the username
+            cartItems = lines.map(line => {
+                const [id, title, price, quantity] = line.split('\t');
+                return { id, title, price, quantity: parseInt(quantity, 10) };
+            });
+        } else {
+            // If the cart doesn't exist, start with the username
+            fileContent = `${username}\n`;
+        }
+
+        // Check if the item already exists in the cart
+        const existingItemIndex = cartItems.findIndex(cartItem => cartItem.id === item.id);
+        if (existingItemIndex !== -1) {
+            // If the item exists, increase the quantity
+            cartItems[existingItemIndex].quantity += item.quantity;
+        } else {
+            // If the item doesn't exist, add it to the cart
+            cartItems.push(item);
+        }
+
+        // Reconstruct the file content
+        const updatedContent = cartItems.map(cartItem => `${cartItem.id}\t${cartItem.title}\t${cartItem.price}\t${cartItem.quantity}`).join('\n');
+        await fs.promises.writeFile(filePath, `${username}\n${updatedContent}`, 'utf8');
+        return { success: true, message: "Item added to cart successfully." };
+    } catch (error) {
+        console.error("Error updating the cart:", error);
+        return { success: false, message: "Error updating the cart." };
+    }
+}
+
+async function getCartContents(username) {
+    const filePath = getUserCartFilePath(username);
+    try {
+        const fileContent = await readFile(filePath, 'utf8');
+        const lines = fileContent.trim().split('\n');
+        const items = lines.slice(1).map(line => {
+            const [id, title, price, quantity, available] = line.split('\t');
+            return { id, title, price, quantity, available: available === 'true' };
+        });
+        return { success: true, items };
+    } catch (error) {
+        console.error("Error reading the cart file:", error);
+        return { success: false, message: "Error reading the cart." };
     }
 }
 
@@ -180,6 +252,38 @@ app.delete('/deleteUser', async (req, res) => {
       console.error("Error deleting user:", error);
       res.status(500).json({ success: false, message: "Error deleting user." });
   }
+});
+
+// Endpoint to get products
+app.get('/products', async (req, res) => {
+    try {
+        const products = await getProducts();
+        res.json({ success: true, products });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to fetch products" });
+    }
+});
+
+app.post('/addToCart', async (req, res) => {
+    const { username, item } = req.body;
+    const result = await addItemToCart(username, item);
+    res.json(result);
+});
+
+app.get('/cart/:username', async (req, res) => {
+    const { username } = req.params;
+    const filePath = getUserCartFilePath(username);
+    try {
+        const cartContents = await fs.promises.readFile(filePath, 'utf8');
+        const items = cartContents.trim().split('\n').slice(1).map(line => {
+            const [id, title, price, quantity] = line.split('\t');
+            return { id, title, price, quantity };
+        });
+        res.json(items); // Send the cart items back to the client
+    } catch (error) {
+        console.error("Error reading the cart file:", error);
+        res.status(500).json({ message: "Error reading the cart." });
+    }
 });
 
 // Define the port number
