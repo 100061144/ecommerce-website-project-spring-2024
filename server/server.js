@@ -131,22 +131,6 @@ async function addItemToCart(username, item) {
     }
 }
 
-async function getCartContents(username) {
-    const filePath = getUserCartFilePath(username);
-    try {
-        const fileContent = await readFile(filePath, 'utf8');
-        const lines = fileContent.trim().split('\n');
-        const items = lines.slice(1).map(line => {
-            const [id, title, price, quantity, available] = line.split('\t');
-            return { id, title, price, quantity, available: available === 'true' };
-        });
-        return { success: true, items };
-    } catch (error) {
-        console.error("Error reading the cart file:", error);
-        return { success: false, message: "Error reading the cart." };
-    }
-}
-
 const app = express();
 
 // Use cors middleware to enable CORS
@@ -301,6 +285,26 @@ app.post('/cart/decrement', async (req, res) => {
     const { username, itemId } = req.body;
     const result = await updateCartItemQuantity(username, itemId, -1); // Decrement by 1
     res.json(result);
+});
+
+app.post('/cart/delete', async (req, res) => {
+    const { username, itemId } = req.body;
+    const filePath = getUserCartFilePath(username); // Assuming this function returns the path to the user's cart file
+
+    try {
+        // Read the current contents of the cart file
+        const cartContents = await fs.promises.readFile(filePath, 'utf8');
+        const lines = cartContents.split('\n');
+        const updatedLines = lines.filter(line => !line.startsWith(itemId)); // Remove the line that starts with the itemId
+
+        // Write the updated lines back to the cart file
+        await fs.promises.writeFile(filePath, updatedLines.join('\n'), 'utf8');
+
+        res.json({ success: true, message: "Item deleted successfully." });
+    } catch (error) {
+        console.error("Error deleting item from cart:", error);
+        res.status(500).json({ success: false, message: "Error deleting item from cart." });
+    }
 });
 
 // Function to update item quantity in the cart

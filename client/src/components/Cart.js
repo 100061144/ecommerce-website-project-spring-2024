@@ -4,6 +4,7 @@ import './Cart.css';
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
+    const [totalCost, setTotalCost] = useState(0);
 
     useEffect(() => {
         fetchCartItems();
@@ -16,6 +17,10 @@ const Cart = () => {
                 const response = await fetch(`http://localhost:3000/cart/${username}`);
                 const data = await response.json();
                 setCartItems(data);
+    
+                // Calculate the total cost
+                const totalCost = data.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+                setTotalCost(totalCost); // Assuming you have a state variable for totalCost
             } catch (error) {
                 console.error("Error fetching cart items:", error);
             }
@@ -53,6 +58,31 @@ const Cart = () => {
         updateQuantity(itemId, 'decrement');
     };
 
+    const confirmDelete = (itemId) => {
+        if (window.confirm("Are you sure you want to delete this item from your cart?")) {
+            deleteCartItem(itemId);
+        }
+    };
+    
+    const deleteCartItem = async (itemId) => {
+        const username = localStorage.getItem("username");
+        // Assuming your server has an endpoint to handle item deletion from the cart
+        const response = await fetch(`http://localhost:3000/cart/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, itemId }),
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert('Item removed successfully');
+            fetchCartItems(); // Refresh the cart items
+        } else {
+            alert('Failed to remove item');
+        }
+    };
+
     return (
         <div className="cart-container">
             <h1>Your Cart</h1>
@@ -67,6 +97,7 @@ const Cart = () => {
                                 <span>{item.quantity}</span>
                                 <button onClick={() => incrementQuantity(item.id)}>+</button>
                             </div>
+                            <button className="delete-button" onClick={() => confirmDelete(item.id)}>Delete</button> {/* Add this line */}
                         </div>
                     ))
                 ) : (
@@ -75,7 +106,10 @@ const Cart = () => {
             </div>
             <div className="cart-actions">
                 <Link to="/" className="cart-button">Back to Home</Link>
-                <Link to="/checkout" className="cart-button">Proceed to Checkout</Link>
+                <Link to="/payment" className="cart-button">Proceed to Checkout</Link>
+            </div>
+            <div className="cart-total">
+                <h2>Total Cost: ${totalCost}</h2>
             </div>
         </div>
     );

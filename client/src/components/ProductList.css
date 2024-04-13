@@ -16,10 +16,14 @@
     background-color: white;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     display: flex;
-    align-items: center;
-    justify-content: space-between; /* This will space out the button and the search bar */
+    justify-content: center; /* Center the items */
     padding: 10px;
     box-sizing: border-box;
+}
+
+.back-to-home-button {
+    position: absolute;
+    left: 10px; /* Adjust based on your preference */
 }
 
 /* This additional container is for centering the search bar */
@@ -90,11 +94,52 @@
     margin-bottom: 10px; /* Space between image and product title */
 }
 
+.product-details {
+    display: flex;
+    align-items: start; /* Align items at the start of the flex container */
+    gap: 20px; /* Adjust the gap between the image and the text/buttons as needed */
+    padding: 20px; /* Add some padding around the details for better spacing */
+}
+
 .product-image-large {
-    width: 50%; /* Larger size for the product details view */
+    flex: 1; /* Allows the image to grow and take up space, adjust as needed */
+    max-width: 50%; /* Limits the image width, adjust based on your design */
     height: auto; /* Maintain aspect ratio */
-    display: block; /* Ensure it's a block element */
-    margin: 0 auto 20px; /* Center the image and add space below */
+}
+
+.product-info {
+    flex: 2; /* Allows the text and buttons to take up the remaining space */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Adjust the gap between text/buttons as needed */
+}
+.product-image-large {
+    width: 100%; /* Keep it responsive, but you might want to set a max-width */
+    max-width: 800px; /* Adjust this value based on your layout */
+    height: 700px; /* Increased height */
+    object-fit: cover; /* This will cover the area without distorting the image */
+    border-radius: 4px; /* Optional: Adds rounded corners to the image */
+    margin: auto; /* Center the image if it's not filling the entire width of its container */
 }
 
 /* Ensure the SearchBar component's CSS (SearchBar.css) centers the input field if not already */
+.similar-products-container {
+    margin-top: 20px;
+}
+
+.similar-products {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+}
+
+.similar-product-item {
+    flex: 0 0 auto; /* Prevent flex items from growing or shrinking */
+    width: 200px; /* Adjust based on your design */
+    cursor: pointer;
+}
+
+.similar-product-image {
+    width: 100%;
+    height: auto;
+}

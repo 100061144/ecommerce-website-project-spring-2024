@@ -57,3 +57,26 @@
 .quantity-controls span {
     padding: 0 10px; /* Adds padding around the quantity number for more space */
 }
+
+.delete-button {
+    padding: 10px 20px;
+    background-color: #dc3545; /* Bootstrap's danger color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+    background-color: #c82333; /* A darker shade for hover */
+}
+
+.cart-total {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    width: fit-content;
+    align-self: center;
+}

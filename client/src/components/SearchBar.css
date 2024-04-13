@@ -1,15 +1,30 @@
 .search-bar {
     display: flex;
     justify-content: center;
+    width: 50%; /* Adjust this value to control the width of the search bar */
+    margin: 0 auto; /* This will center the search bar */
     margin-bottom: 20px;
+    position: relative; /* Allows absolute positioning inside */
   }
   
   .search-input {
     padding: 10px;
-    width: 200px;
+    width: calc(100% - 60px); /* Adjust based on the button width to ensure it doesn't overflow */
     border: 1px solid #ccc;
     border-radius: 4px 0 0 4px;
     outline: none;
+  }
+  
+  .clear-button {
+  position: absolute;
+  right: 60px; /* Adjust based on the search button width */
+  top: 0;
+  bottom: 0;
+  width: 40px; /* Adjust as needed */
+  background: transparent;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
   }
   
   .search-button {
@@ -20,8 +35,3 @@
     border-radius: 0 4px 4px 0;
     cursor: pointer;
   }
-  
-  .search-button:hover {
-    background-color: #0056b3;
-  }
-  

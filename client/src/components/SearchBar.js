@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import './SearchBar.css'; // Assuming you'll create a CSS file for styling
 
 const SearchBar = ({ onSearch }) => {
@@ -8,13 +8,17 @@ const SearchBar = ({ onSearch }) => {
 
     const handleInputChange = (e) => {
         setQuery(e.target.value);
-        // Optionally, you can call onSearch here if you want to search as the user types
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSearch(query);
-        navigate('/products'); // Navigate to the products page on submit
+        // Update the URL with the search query without navigating away
+        navigate(`/products?search=${encodeURIComponent(query)}`);
+    };
+
+    const clearQuery = () => {
+        setQuery('');
+        navigate('/products');
     };
 
     return (
@@ -26,6 +30,11 @@ const SearchBar = ({ onSearch }) => {
                 placeholder="Search for items..."
                 className="search-input"
             />
+            {query && (
+                <button type="button" onClick={clearQuery} className="clear-button">
+                    X
+                </button>
+            )}
             <button type="submit" className="search-button">Search</button>
         </form>
     );
