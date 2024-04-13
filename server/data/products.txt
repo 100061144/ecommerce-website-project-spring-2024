@@ -1,11 +1,56 @@
-101-019	Pencil	5	13
-This pencil is good for writing notes!
+101-001	White Kandoora	200	10
+A white arabic-style kandoora.
 
-101-184	Water	2	25
-This water is good for hydrating!
+101-002	Navy Blue Kandoora	200	10
+A navy-blue qatari-style kandoora.
 
-101-194	Cola	3	15
-This cola is good for accelerating bone deficiency!
+101-003	Black Kandoora	200	10
+A black kuwaiti-style kandoora.
 
-101-164	Headphones	50	5
-These headphones make you forget about existance itself!
+101-011	White Ghutra	50	10
+A plain ghutra for men.
+
+101-012	Red/White Ghutra	50	10
+The classic ghutra for men.
+
+101-021	Black Agal	60	10
+A black agal headress for men.
+
+101-022	Black Agal with Tail	60	10
+A tailed-black agal headress for men.
+
+102-001	Black Abaya	220	10
+A black abaya for women.
+
+102-002	Dark Brown Abaya	220	10
+A dark brown abaya for women.
+
+102-003	Light Brown Abaya	220	10
+A light brown abaya for women.
+
+102-011	White Sheila	120	10
+A white sheila for women.
+
+102-012	Dark Maroon Sheila	120	10
+A dark maroon sheila for women.
+
+102-013	Dark Mustard Sheila	120	10
+A dark mustard sheila for women.
+
+103-001	White Kandoora	170	10
+A white kids kandoora.
+
+103-002	Navy Blue Kandoora	170	10
+A navy blue kandoora.
+
+103-003	Yellow Kandoora	170	10
+A yellow kids kandoora.
+
+103-011	Patterned Abaya	170	10
+A black and white patterned kids abaya.
+
+103-012	Black-White Abaya	170	10
+A black and white kids abaya.
+
+103-013	Black Abaya	170	10
+A black kids abaya with a knitted scarf.

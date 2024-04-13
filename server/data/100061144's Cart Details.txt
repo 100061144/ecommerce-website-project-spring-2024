@@ -1,3 +1,2 @@
 100061144
-101-019	Pencil	5	4
-101-184	Water	2	1
+101-001	White Kandoora	200	1

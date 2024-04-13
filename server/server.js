@@ -77,9 +77,12 @@ async function updateUserProfile(originalUsername, updates) {
 async function getProducts() {
     try {
         const data = await readFile(productsFilePath, 'utf8');
-        const products = data.trim().split('\n\n').map(productBlock => {
-            const [line1, description] = productBlock.split('\n');
-            const [id, name, price, quantity] = line1.split('\t');
+        // Handle both Unix (\n) and Windows (\r\n) newlines
+        const productBlocks = data.trim().split(/\r?\n\r?\n/);
+        const products = productBlocks.map(block => {
+            const lines = block.split(/\r?\n/);
+            const [id, name, price, quantity] = lines[0].split('\t');
+            const description = lines.slice(1).join(' '); // Join the rest as description
             return { id, name, price, quantity, description };
         });
         return products;
@@ -157,25 +160,25 @@ app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const result = authenticateUser(username, password);
     if (result.success) {
-      res.json(result); // Ensure this includes username, email, phoneNumber, firstName, lastName
+        res.json(result); // Ensure this includes username, email, phoneNumber, firstName, lastName
     } else {
-      res.status(401).json({ success: false, message: "Invalid credentials" });
+        res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 });
 
 app.post('/signup', (req, res) => {
-const { username, password, email, phoneNumber, firstName, lastName } = req.body;
-const newUserLine = `${username}\t${password}\t${email}\t${phoneNumber}\t${firstName}\t${lastName}\n`;
+    const { username, password, email, phoneNumber, firstName, lastName } = req.body;
+    const newUserLine = `${username}\t${password}\t${email}\t${phoneNumber}\t${firstName}\t${lastName}\n`;
 
-const filePath = path.join(__dirname, 'data', 'users.txt'); // Adjust the path to your users.txt file
+    const filePath = path.join(__dirname, 'data', 'users.txt'); // Adjust the path to your users.txt file
 
-fs.appendFile(filePath, newUserLine, (err) => {
-    if (err) {
-    console.error('Failed to append new user to file:', err);
-    return res.status(500).send('Error signing up the user.');
-    }
-    res.status(200).send('User signed up successfully.');
-});
+    fs.appendFile(filePath, newUserLine, (err) => {
+        if (err) {
+        console.error('Failed to append new user to file:', err);
+        return res.status(500).send('Error signing up the user.');
+        }
+        res.status(200).send('User signed up successfully.');
+    });
 });
 
 app.get('/isAuthenticated', (req, res) => {
@@ -185,14 +188,14 @@ app.get('/isAuthenticated', (req, res) => {
 });
 
 app.get('/profile/:username', (req, res) => {
-  const { username } = req.params;
-  const userData = getUserData(username);
+    const { username } = req.params;
+    const userData = getUserData(username);
 
-  if (userData) {
-    res.json({ success: true, userData });
-  } else {
-    res.status(404).json({ success: false, message: 'User not found' });
-  }
+    if (userData) {
+        res.json({ success: true, userData });
+    } else {
+        res.status(404).json({ success: false, message: 'User not found' });
+    }
 });
 
 app.post('/updateProfile', async (req, res) => {
@@ -202,56 +205,56 @@ app.post('/updateProfile', async (req, res) => {
 });
 
 app.delete('/deleteAccount', async (req, res) => {
-  const { username } = req.body; // Assuming the username is sent in the request body
+    const { username } = req.body; // Assuming the username is sent in the request body
 
-  const filePath = path.join(__dirname, 'data', 'users.txt');
-  try {
-      const data = await readFile(filePath, 'utf8');
-      const lines = data.split('\n');
-      const updatedLines = lines.filter(line => {
-          const [fileUsername] = line.split('\t');
-          return fileUsername !== username;
-      });
+    const filePath = path.join(__dirname, 'data', 'users.txt');
+    try {
+        const data = await readFile(filePath, 'utf8');
+        const lines = data.split('\n');
+        const updatedLines = lines.filter(line => {
+            const [fileUsername] = line.split('\t');
+            return fileUsername !== username;
+        });
 
-      await writeFile(filePath, updatedLines.join('\n'), 'utf8');
-      res.json({ success: true, message: "Account deleted successfully." });
-  } catch (error) {
-      console.error("Error deleting user account:", error);
-      res.status(500).json({ success: false, message: "Error deleting user account." });
-  }
+        await writeFile(filePath, updatedLines.join('\n'), 'utf8');
+        res.json({ success: true, message: "Account deleted successfully." });
+    } catch (error) {
+        console.error("Error deleting user account:", error);
+        res.status(500).json({ success: false, message: "Error deleting user account." });
+    }
 });
 
 app.get('/users', (req, res) => {
-  const filePath = path.join(__dirname, 'data', 'users.txt');
-  fs.readFile(filePath, 'utf8', (err, data) => {
-      if (err) {
-          console.error("Failed to read users file:", err);
-          return res.status(500).json({ success: false, message: "Failed to read users data" });
-      }
+    const filePath = path.join(__dirname, 'data', 'users.txt');
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error("Failed to read users file:", err);
+            return res.status(500).json({ success: false, message: "Failed to read users data" });
+        }
 
-      const users = data.trim().split('\n').map(line => {
-          const [username, , email, phoneNumber, firstName, lastName] = line.split('\t');
-          return { username, email, phoneNumber, firstName, lastName };
-      });
+        const users = data.trim().split('\n').map(line => {
+            const [username, , email, phoneNumber, firstName, lastName] = line.split('\t');
+            return { username, email, phoneNumber, firstName, lastName };
+        });
 
-      res.json({ success: true, users });
-  });
+        res.json({ success: true, users });
+    });
 });
 
 app.delete('/deleteUser', async (req, res) => {
-  const { username } = req.body; // The username of the user to delete
+    const { username } = req.body; // The username of the user to delete
 
-  const filePath = path.join(__dirname, 'data', 'users.txt');
-  try {
-      const data = await fs.promises.readFile(filePath, 'utf8');
-      const lines = data.split('\n');
-      const filteredLines = lines.filter(line => line.split('\t')[0] !== username);
-      await fs.promises.writeFile(filePath, filteredLines.join('\n'), 'utf8');
-      res.json({ success: true, message: "User deleted successfully." });
-  } catch (error) {
-      console.error("Error deleting user:", error);
-      res.status(500).json({ success: false, message: "Error deleting user." });
-  }
+    const filePath = path.join(__dirname, 'data', 'users.txt');
+    try {
+        const data = await fs.promises.readFile(filePath, 'utf8');
+        const lines = data.split('\n');
+        const filteredLines = lines.filter(line => line.split('\t')[0] !== username);
+        await fs.promises.writeFile(filePath, filteredLines.join('\n'), 'utf8');
+        res.json({ success: true, message: "User deleted successfully." });
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({ success: false, message: "Error deleting user." });
+    }
 });
 
 // Endpoint to get products
@@ -285,6 +288,52 @@ app.get('/cart/:username', async (req, res) => {
         res.status(500).json({ message: "Error reading the cart." });
     }
 });
+
+// Endpoint to increment item quantity in the cart
+app.post('/cart/increment', async (req, res) => {
+    const { username, itemId } = req.body;
+    const result = await updateCartItemQuantity(username, itemId, 1); // Increment by 1
+    res.json(result);
+});
+
+// Endpoint to decrement item quantity in the cart
+app.post('/cart/decrement', async (req, res) => {
+    const { username, itemId } = req.body;
+    const result = await updateCartItemQuantity(username, itemId, -1); // Decrement by 1
+    res.json(result);
+});
+
+// Function to update item quantity in the cart
+async function updateCartItemQuantity(username, itemId, change) {
+    const filePath = getUserCartFilePath(username);
+    try {
+        let fileContent = await fs.promises.readFile(filePath, 'utf8');
+        let lines = fileContent.trim().split('\n');
+        let updated = false;
+
+        const updatedLines = lines.map(line => {
+            if (line.startsWith(itemId)) {
+                let parts = line.split('\t');
+                let quantity = parseInt(parts[3], 10) + change;
+                if (quantity < 1) quantity = 1; // Ensure quantity doesn't go below 1
+                parts[3] = String(quantity);
+                updated = true;
+                return parts.join('\t');
+            }
+            return line;
+        });
+
+        if (updated) {
+            await fs.promises.writeFile(filePath, updatedLines.join('\n'), 'utf8');
+            return { success: true, message: "Cart updated successfully." };
+        } else {
+            return { success: false, message: "Item not found in cart." };
+        }
+    } catch (error) {
+        console.error("Error updating the cart:", error);
+        return { success: false, message: "Error updating the cart." };
+    }
+}
 
 // Define the port number
 const PORT = 3000;

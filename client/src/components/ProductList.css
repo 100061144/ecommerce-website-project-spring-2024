@@ -5,6 +5,26 @@
     flex-direction: column; /* Keep the column layout for overall alignment */
     align-items: center; /* Center items horizontally */
     padding: 10px; /* Adjust as needed */
+    width: 100%; /* Ensure it spans the full width */
+}
+
+.search-bar-container {
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* This will space out the button and the search bar */
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* This additional container is for centering the search bar */
+.search-bar-wrapper {
+    flex-grow: 1;
 }
 
 /* Use a grid layout for the products */
@@ -14,8 +34,12 @@
     gap: 20px; /* Adjust the gap between grid items */
     width: 100%; /* Adjust based on your preference */
     max-width: 1200px; /* Maximum width of the grid */
-    align-items: center; /* Center items horizontally */
-    padding: 10px; /* Adjust as needed */
+    align-items: start; /* Align items at the start of each cell */
+    padding: 20px; /* Adjust as needed */
+    margin-top: 20px; /* Space between search bar and grid */
+    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: calc(100vh - 160px); /* Adjust this value based on your header/search bar height */
+    box-sizing: border-box; /* Includes padding in the element's total width and height */
 }
 
 .product-item {
@@ -25,19 +49,19 @@
 }
 
 .back-to-home-button {
-    padding: 10px 20px;
-    margin: 20px auto; /* Center the button horizontally */
-    display: block; /* Make the button a block element */
-    color: white;
+    /* Styling for the "Back to Home" button */
     background-color: #007bff; /* Adjust color to match your theme */
+    color: white; /* White text */
     border: none;
+    padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin-right: auto; /* Keeps the button on the left */
 }
 
 .back-to-home-button:hover {
-    background-color: #0056b3; /* Adjust hover color to match your theme */
+    background-color: #0056b3; /* Darker blue on hover */
 }
 
 .product-title {
@@ -72,3 +96,5 @@
     display: block; /* Ensure it's a block element */
     margin: 0 auto 20px; /* Center the image and add space below */
 }
+
+/* Ensure the SearchBar component's CSS (SearchBar.css) centers the input field if not already */

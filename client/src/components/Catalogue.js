@@ -33,8 +33,8 @@ const Catalogue = () => {
       name: 'Kids',
       image: '/images/kids_section.jpg',
       subSections: [
-        { name: 'Ghutra', image: '/images/kids_ghutra.jpg' },
-        { name: 'Books', image: '/images/kids_books.jpg' },
+        { name: 'Boys', image: '/images/kids_boys.jpg' },
+        { name: 'Girls', image: '/images/kids_girls.jpg' },
         // Add more sub-sections as needed
       ],
     },
