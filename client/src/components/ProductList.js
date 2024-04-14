@@ -47,17 +47,8 @@ const ProductList = () => {
     }, [location.search]); // React to changes in search query and section
 
     const handleSearch = (query) => {
-        if (!query.trim()) {
-            setFilteredProducts(products);
-            return;
-        }
-        const lowerCaseQuery = query.toLowerCase();
-        const filtered = products.filter(product =>
-            product.id.toLowerCase().includes(lowerCaseQuery) ||
-            product.name.toLowerCase().includes(lowerCaseQuery) ||
-            product.description.toLowerCase().includes(lowerCaseQuery)
-        );
-        setFilteredProducts(filtered);
+        // Navigate to the same page but with the new search query, replacing any existing query
+        navigate(`?search=${encodeURIComponent(query)}`);
     };
 
     const addItemToCart = async (product) => {
@@ -84,9 +75,15 @@ const ProductList = () => {
                     className="back-to-home-button" 
                     onClick={() => navigate('/')}
                 >
-                    Back
+                    Back to Home
                 </button>
-                <SearchBar onSearch={handleSearch} />
+                    <SearchBar onSearch={handleSearch} placeholder="Search for items..." />
+                <button 
+                    className="cart-button" 
+                    onClick={() => navigate('/cart')}
+                >
+                    Cart
+            </button>
             </div>
             {selectedProduct ? (
                 <>

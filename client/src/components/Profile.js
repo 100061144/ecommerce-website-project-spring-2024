@@ -100,6 +100,10 @@ const Profile = () => {
     }
   };
 
+  const navigateToHome = () => {
+    navigate('/');
+  };
+
   return (
     <div className="profile-container">
       <h1>User Profile</h1>
@@ -127,8 +131,9 @@ const Profile = () => {
           <p><strong>Phone Number:</strong> {phoneNumber}</p>
           <p><strong>First Name:</strong> {firstName}</p>
           <p><strong>Last Name:</strong> {lastName}</p>
-          <button onClick={handleSignOut} className="profile-sign-out-button">Sign Out</button>
+          <button onClick={navigateToHome} className="profile-back-to-home-button">Back to Home</button>
           <button onClick={() => setEditMode(true)} className="edit-profile-button">Edit Profile</button>
+          <button onClick={handleSignOut} className="profile-sign-out-button">Sign Out</button>
           <button onClick={handleDeleteAccount} className="delete-account-button">Delete My Account</button>
         </>
       )}

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './SearchBar.css'; // Assuming you'll create a CSS file for styling
+import { useNavigate } from 'react-router-dom'; // Keep this for navigation
+import './SearchBar.css';
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch, navigateOnSearch, placeholder = "Search..." }) => {
     const [query, setQuery] = useState('');
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
 
     const handleInputChange = (e) => {
         setQuery(e.target.value);
@@ -12,13 +12,22 @@ const SearchBar = ({ onSearch }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Update the URL with the search query without navigating away
-        navigate(`/products?search=${encodeURIComponent(query)}`);
+        if (navigateOnSearch) {
+            // Navigate to the specified path with the search query
+            navigate(`${navigateOnSearch}?search=${encodeURIComponent(query)}`);
+        } else {
+            // Call onSearch for in-page filtering
+            onSearch(query);
+        }
     };
 
     const clearQuery = () => {
         setQuery('');
-        navigate('/products');
+        if (navigateOnSearch) {
+            navigate(navigateOnSearch);
+        } else {
+            onSearch('');
+        }
     };
 
     return (
@@ -27,7 +36,7 @@ const SearchBar = ({ onSearch }) => {
                 type="text"
                 value={query}
                 onChange={handleInputChange}
-                placeholder="Search for items..."
+                placeholder={placeholder} // Use the placeholder prop
                 className="search-input"
             />
             {query && (

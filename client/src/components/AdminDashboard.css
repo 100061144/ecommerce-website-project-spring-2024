@@ -45,7 +45,7 @@
   background-color: #c82330; /* Darker red on hover */
 }
 
-.admin-content {
+.admin-users-content {
   display: flex;
   width: 100%;
   max-width: 1200px; /* Adjust based on your preference */
@@ -122,4 +122,56 @@
   margin-top: 20px; /* Adds space above the delete button */
   padding: 10px 0; /* Larger padding for easier clickability */
   font-size: 16px; /* Larger font size for the button text */
+}
+
+/* Ensure the search bar container fills its line and centers the search bar within it */
+.search-bar-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 20px; /* Adjust spacing as needed */
+}
+
+/* If the SearchBar component itself can be styled directly, adjust its class styling */
+.search-bar {
+  width: 50%; /* Adjust this to control the search bar width */
+  max-width: 600px; /* Prevents the search bar from becoming too wide */
+  margin: 0 auto; /* Centers the search bar if its width is less than 100% */
+}
+
+/* Style the orders list for a grid layout */
+.orders-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Creates a grid with 3 columns */
+  gap: 20px; /* Adjusts the gap between grid items */
+  max-height: 600px; /* Sets a maximum height to make the list scrollable */
+  overflow-y: auto; /* Enables vertical scrolling */
+  padding: 10px; /* Adds some padding around the grid */
+}
+
+.order-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.order-item select {
+  width: 100%; /* Makes the dropdown take the full width of its container */
+  padding: 8px 10px; /* Adds some padding inside the dropdown for better readability */
+  margin-top: 10px; /* Adds some space above the dropdown */
+  border: 1px solid #ccc; /* Adds a border to the dropdown */
+  border-radius: 5px; /* Rounds the corners of the dropdown */
+  background-color: #f8f8f8; /* Sets a background color for the dropdown */
+  font-size: 16px; /* Increases the font size for better readability */
+  cursor: pointer; /* Changes the cursor to indicate it's clickable */
+}
+
+.order-item select:focus {
+  outline: none; /* Removes the default focus outline */
+  border-color: #007bff; /* Changes the border color to indicate focus */
+}
+
+.order-item select option {
+  padding: 5px 0; /* Adds some vertical padding to each option for better readability */
 }

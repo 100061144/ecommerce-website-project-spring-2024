@@ -9,10 +9,12 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 const getUserCartFilePath = (username) => path.join(__dirname, 'data', `${username}'s Cart Details.txt`);
+const ordersFilePath = path.join(__dirname, 'data', 'orders.txt');
 
 // Convert fs.readFile into Promise version of same    
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
+const appendFile = util.promisify(fs.appendFile);
 const productsFilePath = path.join(__dirname, 'data', 'products.txt');
 
 async function checkAuthentication(username, password) {
@@ -128,6 +130,52 @@ async function addItemToCart(username, item) {
     } catch (error) {
         console.error("Error updating the cart:", error);
         return { success: false, message: "Error updating the cart." };
+    }
+}
+
+async function createNewOrder(username, address, city, country) {
+    try {
+    // Read the user's cart
+    const cartFilePath = getUserCartFilePath(username);
+    const cartContents = await readFile(cartFilePath, 'utf8');
+    const cartLines = cartContents.trim().split('\n').slice(1); // Skip the first line containing the username
+
+    if (cartLines.length === 0) {
+        return { success: false, message: "Cart is empty." };
+    }
+
+    // Calculate total price
+    let totalPrice = 0;
+    const productsWithQuantities = cartLines.map(line => {
+        const [id, , price, quantity] = line.split('\t');
+        totalPrice += parseFloat(price) * parseInt(quantity, 10);
+        return `${id}(${quantity})`; // Format: productID(quantity)
+    });
+
+    // Generate a new order ID
+    const ordersData = await readFile(ordersFilePath, 'utf8');
+    const orderLines = ordersData.trim().split('\n\n');
+    const lastOrderLine = orderLines[orderLines.length - 1].split('\n')[0];
+    const lastOrderId = lastOrderLine.split('\t')[0];
+    const orderIdNumber = lastOrderId.startsWith('201-') ? parseInt(lastOrderId.split('-')[1], 10) + 1 : 1;
+    const newOrderId = `201-${String(orderIdNumber).padStart(4, '0')}`;
+
+    // Format the new order
+    const today = new Date();
+    const formattedDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+
+    const newOrder = `${newOrderId}\t${username}\t${formattedDate}\t${totalPrice}\tPending\t${address}, ${city}, ${country}\n${productsWithQuantities.join('\t')}\n`;
+
+    // Append the new order to orders.txt
+    await appendFile(ordersFilePath, `\n${newOrder}`);
+
+    // Clear the user's cart
+    await writeFile(cartFilePath, `${username}\n`);
+
+    return { success: true, message: "Order created successfully." };
+    } catch (error) {
+    console.error("Error creating new order:", error);
+    return { success: false, message: "Error creating new order." };
     }
 }
 
@@ -325,20 +373,126 @@ app.get('/orders/:username', async (req, res) => {
             return acc;
         }, {});
 
-        // Filter and map orders for the given username, now including the price
+        // Filter and map orders for the given username, now including the address and parsing product quantities
         const orders = ordersData.trim().split('\n\n').map(block => {
             const lines = block.split('\n');
-            const [orderID, orderUsername, orderDate, price, orderStatus] = lines[0].split('\t');
+            const orderDetails = lines[0].split('\t');
+            const orderID = orderDetails[0];
+            const orderUsername = orderDetails[1];
+            const orderDate = orderDetails[2];
+            const price = orderDetails[3];
+            const orderStatus = orderDetails[4];
+            const address = orderDetails.slice(5).join(' '); // Join the rest as the address
+
             if (orderUsername !== username) return null; // Filter out orders not belonging to the user
+
             const productIDs = lines[1].split('\t');
-            const products = productIDs.map(id => ({ id, name: productMap[id] || 'Unknown Product' }));
-            return { orderID, username: orderUsername, orderDate, price, orderStatus, products };
+            const products = productIDs.map(id => {
+                const [productId, quantity] = id.includes('(') ? id.split('(') : [id, '1'];
+                const cleanQuantity = quantity ? parseInt(quantity.replace(')', ''), 10) : 1;
+                return { id: productId, name: productMap[productId] || 'Unknown Product', quantity: cleanQuantity };
+            });
+
+            return { orderID, username: orderUsername, orderDate, price, orderStatus, address, products };
         }).filter(order => order !== null); // Remove nulls from filtered out orders
 
         res.json({ success: true, orders });
     } catch (error) {
         console.error("Error reading the order or product files:", error);
         res.status(500).json({ success: false, message: "Error processing the order history." });
+    }
+});
+
+// ADMIN ORDER PAGE
+app.get('/orders', async (req, res) => {
+    try {
+        // Step 1: Read and parse product details
+        const productsData = await fs.promises.readFile(path.join(__dirname, 'data', 'products.txt'), 'utf8');
+        const productMap = productsData.trim().split(/\r?\n\r?\n/).reduce((acc, productBlock) => {
+            // Splitting lines in a block using both \r\n and \n for compatibility
+            const lines = productBlock.split(/\r?\n/);
+            const [id, name] = lines[0].split('\t'); // Assuming the first line contains ID and name
+            acc[id.trim()] = name.trim(); // Trim to remove any leading/trailing spaces
+            return acc;
+        }, {});
+
+        // Read orders
+        const ordersData = await fs.promises.readFile(path.join(__dirname, 'data', 'orders.txt'), 'utf8');
+        const orders = ordersData.trim().split('\n\n').map(orderBlock => {
+            const lines = orderBlock.split('\n');
+            const [orderID, username, orderDate, totalPrice, status, ...addressParts] = lines[0].split('\t');
+            const address = addressParts.join(' ');
+            const products = lines[1].split('\t').map(productInfo => {
+                const [productId, quantity] = productInfo.includes('(') ? productInfo.split('(') : [productInfo, '1'];
+                const cleanQuantity = quantity.replace(')', '');
+                const productName = productMap[productId] || 'Unknown Product'; // Use the mapping
+                return { id: productId, name: productName, quantity: cleanQuantity };
+            });
+            return { orderID, username, orderDate, totalPrice, status, address, products };
+        });
+        res.json({ success: true, orders });
+    } catch (error) {
+        console.error("Error fetching orders or products:", error);
+        res.status(500).json({ success: false, message: "Error fetching orders." });
+    }
+});
+
+// ADMIN UPDATE ORDER STATUS
+app.post('/updateOrderStatus', async (req, res) => {
+    const { orderID, newStatus } = req.body;
+    try {
+        let ordersData = await fs.promises.readFile(path.join(__dirname, 'data', 'orders.txt'), 'utf8');
+        let orders = ordersData.trim().split('\n\n');
+        let updated = false;
+
+        const updatedOrders = orders.map(orderBlock => {
+            const lines = orderBlock.split('\n');
+            const orderDetails = lines[0].split('\t');
+            if (orderDetails[0] === orderID) {
+                orderDetails[4] = newStatus; // Update the status
+                updated = true;
+                return `${orderDetails.join('\t')}\n${lines[1]}`;
+            }
+            return orderBlock;
+        });
+
+        if (updated) {
+            await fs.promises.writeFile(path.join(__dirname, 'data', 'orders.txt'), updatedOrders.join('\n\n'), 'utf8');
+            res.json({ success: true, message: "Order status updated successfully." });
+        } else {
+            res.status(404).json({ success: false, message: "Order not found." });
+        }
+    } catch (error) {
+        console.error("Error updating order status:", error);
+        res.status(500).json({ success: false, message: "Error updating order status." });
+    }
+});
+
+app.post('/createOrder', async (req, res) => {
+    const { username, address, city, country } = req.body;
+    try {
+        const result = await createNewOrder(username, address, city, country);
+        if (result.success) {
+            // Define the path to the user's cart file
+            const cartFilePath = path.join(__dirname, 'data', `${username}'s Cart Details.txt`);
+
+            try {
+                await fs.promises.unlink(cartFilePath);
+                console.log(`${username}'s cart file deleted successfully.`);
+            } catch (err) {
+                console.error(`Failed to delete ${username}'s cart file:`, err);
+                // Since the order was successfully created, continue to send a success response
+            }
+
+            // Respond to the client that the order was created successfully
+            res.json({ success: true, message: "Order created successfully." });
+        } else {
+            // If the order creation was not successful, send an error response
+            res.status(400).json({ success: false, message: result.message });
+        }
+    } catch (error) {
+        console.error("Error creating order:", error);
+        res.status(500).json({ success: false, message: "Server error while creating order." });
     }
 });
 

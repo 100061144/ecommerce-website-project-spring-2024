@@ -58,11 +58,27 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 10px;
+    width: 100%;
+}
+
+.orders-header h1 {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.orders-header::after {
+    content: '';
+    margin-right: auto;
 }
 
 .orders-header button {
     padding: 5px 10px;
     margin-right: 20px; /* Adjust spacing as needed */
+}
+
+.header-spacer {
+    width: 130px; /* Adjust this width to match the button's width */
+    /* If the button's width is dynamic or not easily matched, you might use flex properties instead */
 }
 
 .orders-content {
@@ -83,6 +99,8 @@ body {
     cursor: pointer; /* Ensures the cursor changes to a pointer on hover */
     border: none; /* Removes the default border from the button */
     font-size: 16px; /* Adjust as needed */
+    margin-right: auto; /* This will push all other elements to the opposite side */
+
 }
 
 .back-to-home:hover {

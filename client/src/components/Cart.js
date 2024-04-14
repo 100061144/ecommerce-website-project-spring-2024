@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Cart.css';
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const [totalCost, setTotalCost] = useState(0);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchCartItems();
@@ -83,6 +84,14 @@ const Cart = () => {
         }
     };
 
+    const handleActionClick = () => {
+        if (cartItems.length > 0) {
+            navigate('/payment');
+        } else {
+            navigate('/products');
+        }
+    };
+
     return (
         <div className="cart-container">
             <h1>Your Cart</h1>
@@ -91,7 +100,7 @@ const Cart = () => {
                     cartItems.map((item, index) => (
                         <div key={index} className="cart-item">
                             <h2>{item.title}</h2>
-                            <p>Price: ${item.price}</p>
+                            <p>Price: {item.price} AED</p>
                             <div className="quantity-controls">
                                 <button onClick={() => decrementQuantity(item.id)}>-</button>
                                 <span>{item.quantity}</span>
@@ -106,10 +115,13 @@ const Cart = () => {
             </div>
             <div className="cart-actions">
                 <Link to="/" className="cart-button">Back to Home</Link>
-                <Link to="/payment" className="cart-button">Proceed to Checkout</Link>
+                {/* Use a div or span for the "Proceed to Checkout" that looks like a link but conditionally handles clicks */}
+                <div className="cart-button" onClick={handleActionClick}>
+                    {cartItems.length > 0 ? 'Proceed to Checkout' : 'Add Items to Cart'}
+                </div>
             </div>
             <div className="cart-total">
-                <h2>Total Cost: ${totalCost}</h2>
+                <h2>Total Cost: {totalCost} AED</h2>
             </div>
         </div>
     );

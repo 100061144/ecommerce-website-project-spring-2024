@@ -23,7 +23,7 @@
 
 .back-to-home-button {
     position: absolute;
-    left: 10px; /* Adjust based on your preference */
+    left: 100px; /* Adjust based on your preference */
 }
 
 /* This additional container is for centering the search bar */
@@ -142,4 +142,22 @@
 .similar-product-image {
     width: 100%;
     height: auto;
+}
+
+.cart-button {
+    /* Styling for the "Cart" button */
+    position: absolute;
+    right: 100px; /* Adjust based on your preference */
+    background-color: #007bff; /* Adjust color to match your theme */
+    color: white; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: auto; /* Keeps the button on the left */
+}
+
+.cart-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
 }

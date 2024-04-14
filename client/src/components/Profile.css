@@ -28,7 +28,7 @@
     margin-bottom: 10px;
 }
 
-.profile-sign-out-button, .delete-account-button, .edit-profile-button, .profile-edit-form button {
+.profile-sign-out-button, .delete-account-button, .edit-profile-button, .profile-edit-form button, .profile-back-to-home-button {
     padding: 10px 20px;
     margin-top: 10px;
     color: white;
@@ -105,3 +105,10 @@
     background-color: #0056b3;
 }
 
+.profile-back-to-home-button {
+    background-color: #007bff;
+}
+
+.profile-back-to-home-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}

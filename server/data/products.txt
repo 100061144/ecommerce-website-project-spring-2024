@@ -11,7 +11,7 @@ A black kuwaiti-style kandoora.
 A plain ghutra for men.
 
 101-012	Red/White Ghutra	50	10
-The classic ghutra for men.
+A classic ghutra for men.
 
 101-021	Black Agal	60	10
 A black agal headress for men.

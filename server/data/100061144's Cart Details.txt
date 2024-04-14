@@ -1,5 +1,0 @@
-100061144
-101-002	Navy Blue Kandoora	200	1
-101-012	Red/White Ghutra	50	1
-101-022	Black Agal with Tail	60	1
-103-001	White Kandoora	170	1

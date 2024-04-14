@@ -6,7 +6,11 @@ const Payment = () => {
   const [paymentDetails, setPaymentDetails] = useState({
     cardNumber: '',
     expiryDate: '',
-    cvv: ''
+    cvv: '',
+    // Add new fields for the shipping address
+    address: '',
+    city: '',
+    country: '',
   });
 
   const navigate = useNavigate();
@@ -19,17 +23,64 @@ const Payment = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would usually handle the payment processing
-    alert('Payment Successful!');
-    navigate('/');
+    const username = localStorage.getItem("username"); // Assuming username is stored in localStorage
+    if (!username) {
+      alert('You must be logged in to make a payment.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/createOrder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username, // Assuming you have the username stored or retrieved from somewhere
+          // Include the shipping details in the request
+          address: paymentDetails.address,
+          city: paymentDetails.city,
+          country: paymentDetails.country,
+          // Include other necessary details as required
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert('Payment Successful and Order Created!');
+        navigate('/'); // Navigate to the homepage or another route upon success
+      } else {
+        alert('Failed to process payment and create order.');
+      }
+    } catch (error) {
+      console.error("Error processing payment:", error);
+      alert('An error occurred while processing your payment.');
+    }
   };
 
   return (
     <div className="payment-container">
       <h1>Payment Page</h1>
       <form onSubmit={handleSubmit} className="payment-form">
+        {/* Shipping Address Section */}
+        <h2>Shipping Address</h2>
+        <div className="form-group">
+          <label htmlFor="address">Address:</label>
+          <input type="text" id="address" name="address" value={paymentDetails.address} onChange={handleChange} required />
+        </div>
+        <div className="form-group">
+          <label htmlFor="city">City:</label>
+          <input type="text" id="city" name="city" value={paymentDetails.city} onChange={handleChange} required />
+        </div>
+        <div className="form-group">
+          <label htmlFor="country">Country:</label>
+          <input type="text" id="country" name="country" value={paymentDetails.country} onChange={handleChange} required />
+        </div>
+
+        {/* Credit Card Details Section */}
+        <h2>Credit Card Details</h2>
         <div className="form-group">
           <label htmlFor="cardNumber">Credit Card Number:</label>
           <input type="text" id="cardNumber" name="cardNumber" value={paymentDetails.cardNumber} onChange={handleChange} required />
