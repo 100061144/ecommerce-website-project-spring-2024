@@ -1,0 +1,65 @@
+/* src/components/Orders.css */
+body {
+    background-color: #ddd; /* Set the background for the entire page */
+}
+
+.orders-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    max-width: 800px; /* Limit the width for better readability */
+    margin: auto; /* Center the container */
+    background-color: #f5f5f5; /* Consistent background color with Home.css */
+    min-height: 100vh; /* Full height */
+    width: 100%; /* Ensure it spans the full width of the viewport */
+    min-height: 100vh; /* Full height */
+    width: 100%; /* Ensure it spans the full width of the viewport */
+}
+
+.order-item {
+    border: 1px solid #ddd; /* Softer border color */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px;
+    margin: 20px 0;
+    width: calc(100% - 40px); /* Adjust width to account for padding */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+    background-color: #ffffff; /* White background for each item */
+    transition: transform 0.2s; /* Smooth transition for hover effect */
+}
+
+.order-item h2 {
+    color: #333; /* Darker text for better contrast */
+    margin-bottom: 10px; /* Space below the order ID and between paragraphs */
+}
+
+.order-item p {
+    color: #666; /* Lighter text color for less emphasis */
+    margin-bottom: 10px; /* Space below the order ID and between paragraphs */
+    line-height: 1.6; /* Improved readability */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .orders-container {
+        padding: 10px;
+        width: 100%; /* Ensure full width on smaller screens */
+    }
+
+    .order-item {
+        padding: 15px;
+        margin: 10px 0; /* Smaller margin on smaller screens */
+        width: calc(100% - 30px); /* Adjust width to account for padding */
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .orders-container {
+        padding: 10px;
+    }
+
+    .order-item {
+        padding: 15px;
+    }
+}

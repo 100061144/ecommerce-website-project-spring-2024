@@ -10,6 +10,7 @@ import Catalogue from './components/Catalogue';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './components/AdminDashboard';
 import ProductList from './components/ProductList';
+import Orders from './components/Orders';
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/catalogue" element={<Catalogue />} />
           <Route path="/admin" element={<AdminDashboard />} /> {/* Add the route for the AdminDashboard */}
           <Route path="/products" element={<ProductList />} />
+          <Route path="/orders" element={<Orders />} />
           {/* You can add more admin-specific routes here */}
         </Route>
       </Routes>

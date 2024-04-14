@@ -307,6 +307,41 @@ app.post('/cart/delete', async (req, res) => {
     }
 });
 
+// Add this endpoint to server.js
+app.get('/orders/:username', async (req, res) => {
+    const { username } = req.params;
+    const ordersFilePath = path.join(__dirname, 'data', 'orders.txt');
+    const productsFilePath = path.join(__dirname, 'data', 'products.txt');
+    try {
+        const productsData = await fs.promises.readFile(productsFilePath, 'utf8');
+        const ordersData = await fs.promises.readFile(ordersFilePath, 'utf8');
+
+        // Create a map of product IDs to product names
+        const productMap = productsData.trim().split('\n\n').reduce((acc, block) => {
+            const [idLine, nameLine] = block.split('\n');
+            const id = idLine.split('\t')[0];
+            const name = nameLine;
+            acc[id] = name;
+            return acc;
+        }, {});
+
+        // Filter and map orders for the given username
+        const orders = ordersData.trim().split('\n\n').map(block => {
+            const lines = block.split('\n');
+            const [orderID, orderUsername, orderDate, orderStatus] = lines[0].split('\t');
+            if (orderUsername !== username) return null; // Filter out orders not belonging to the user
+            const productIDs = lines[1].split('\t');
+            const products = productIDs.map(id => ({ id, name: productMap[id] || 'Unknown Product' }));
+            return { orderID, username: orderUsername, orderDate, orderStatus, products };
+        }).filter(order => order !== null); // Remove nulls from filtered out orders
+
+        res.json({ success: true, orders });
+    } catch (error) {
+        console.error("Error reading the order or product files:", error);
+        res.status(500).json({ success: false, message: "Error processing the order history." });
+    }
+});
+
 // Function to update item quantity in the cart
 async function updateCartItemQuantity(username, itemId, change) {
     const filePath = getUserCartFilePath(username);
