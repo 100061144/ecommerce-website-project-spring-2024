@@ -53,13 +53,38 @@ body {
     }
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .orders-container {
-        padding: 10px;
-    }
+.orders-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+}
 
-    .order-item {
-        padding: 15px;
-    }
+.orders-header button {
+    padding: 5px 10px;
+    margin-right: 20px; /* Adjust spacing as needed */
+}
+
+.orders-content {
+    max-height: 80vh; /* Adjust based on your preference */
+    overflow-y: auto; /* Makes the content scrollable */
+    padding: 10px;
+    width: 100%; /* Ensure it spans the full width of the viewport */
+}
+
+/* Orders.css */
+.back-to-home {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    cursor: pointer; /* Ensures the cursor changes to a pointer on hover */
+    border: none; /* Removes the default border from the button */
+    font-size: 16px; /* Adjust as needed */
+}
+
+.back-to-home:hover {
+    background-color: #0056b3;
 }

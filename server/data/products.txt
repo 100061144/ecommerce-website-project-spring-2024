@@ -37,20 +37,20 @@ A dark maroon sheila for women.
 102-013	Dark Mustard Sheila	120	10
 A dark mustard sheila for women.
 
-103-001	White Kandoora	170	10
+103-001	(Kids) White Kandoora	170	10
 A white kids kandoora.
 
-103-002	Navy Blue Kandoora	170	10
+103-002	(Kids) Navy Blue Kandoora	170	10
 A navy blue kandoora.
 
-103-003	Yellow Kandoora	170	10
+103-003	(Kids) Yellow Kandoora	170	10
 A yellow kids kandoora.
 
-103-011	Patterned Abaya	170	10
+103-011	(Kids) Patterned Abaya	170	10
 A black and white patterned kids abaya.
 
-103-012	Black-White Abaya	170	10
+103-012	(Kids) Black-White Abaya	170	10
 A black and white kids abaya.
 
-103-013	Black Abaya	170	10
+103-013	(Kids) Black Abaya	170	10
 A black kids abaya with a knitted scarf.

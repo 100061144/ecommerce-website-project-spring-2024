@@ -325,14 +325,14 @@ app.get('/orders/:username', async (req, res) => {
             return acc;
         }, {});
 
-        // Filter and map orders for the given username
+        // Filter and map orders for the given username, now including the price
         const orders = ordersData.trim().split('\n\n').map(block => {
             const lines = block.split('\n');
-            const [orderID, orderUsername, orderDate, orderStatus] = lines[0].split('\t');
+            const [orderID, orderUsername, orderDate, price, orderStatus] = lines[0].split('\t');
             if (orderUsername !== username) return null; // Filter out orders not belonging to the user
             const productIDs = lines[1].split('\t');
             const products = productIDs.map(id => ({ id, name: productMap[id] || 'Unknown Product' }));
-            return { orderID, username: orderUsername, orderDate, orderStatus, products };
+            return { orderID, username: orderUsername, orderDate, price, orderStatus, products };
         }).filter(order => order !== null); // Remove nulls from filtered out orders
 
         res.json({ success: true, orders });
