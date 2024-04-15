@@ -25,39 +25,47 @@
 .cart-actions {
     display: flex;
     justify-content: center;
+    gap: 10px; /* Adjust the gap between buttons */
+    flex-wrap: wrap; /* Allow items to wrap if needed */
+    width: 100%; /* Ensure the container takes full width */
+    padding: 10px 0; /* Add some padding above and below the buttons */
 }
 .cart-button {
-    padding: 10px 20px;
+    padding: 10px 15px; /* Adjusted padding */
     background-color: #007bff;
     color: white;
     text-decoration: none;
     border-radius: 5px;
     transition: background-color 0.3s ease;
+    cursor: pointer;
 }
 .cart-button:hover {
     background-color: #0056b3;
 }
-.cart-actions {
-    display: flex;
-    gap: 10px; /* Adjust the gap between buttons */
+/* Specific styles for the back button when combined with cart-button */
+.cart-button.back-button {
+    background-color: #6c757d; /* A gray color, distinguishable from the main action buttons */
+    color: white;
+    padding: 10px 15px; /* Ensure consistent padding with cart-button */
+    margin-top: 50px; /* Move the back button downward */
+}
+.cart-button.back-button:hover {
+    background-color: #5a6268; /* A slightly darker shade for hover effect */
 }
 .quantity-controls {
     display: flex;
     align-items: center;
     gap: 10px; /* Adjust the gap between the buttons and the quantity number */
 }
-
 .quantity-controls button {
     background-color: #f0f0f0;
     border: 1px solid #ddd;
     padding: 5px 10px;
     cursor: pointer;
 }
-
 .quantity-controls span {
     padding: 0 10px; /* Adds padding around the quantity number for more space */
 }
-
 .delete-button {
     padding: 10px 20px;
     background-color: #dc3545; /* Bootstrap's danger color */
@@ -67,11 +75,9 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-
 .delete-button:hover {
     background-color: #c82333; /* A darker shade for hover */
 }
-
 .cart-total {
     margin-top: 20px;
     padding: 10px;

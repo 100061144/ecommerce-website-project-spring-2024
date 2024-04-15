@@ -113,13 +113,14 @@ const Cart = () => {
                     <p>Your cart is empty.</p>
                 )}
             </div>
-            <div className="cart-actions">
-                <Link to="/" className="cart-button">Back to Home</Link>
-                {/* Use a div or span for the "Proceed to Checkout" that looks like a link but conditionally handles clicks */}
-                <div className="cart-button" onClick={handleActionClick}>
-                    {cartItems.length > 0 ? 'Proceed to Checkout' : 'Add Items to Cart'}
+                <div className="cart-actions">
+                    <Link to="/" className="cart-button">Back to Home</Link>
+                    <div className="cart-button" onClick={handleActionClick}>
+                        {cartItems.length > 0 ? 'Proceed to Checkout' : 'Add Items to Cart'}
+                    </div>
+                    {/* Add this button for going back */}
+                    <button className="cart-button back-button" onClick={() => navigate(-1)}>Go Back</button>
                 </div>
-            </div>
             <div className="cart-total">
                 <h2>Total Cost: {totalCost} AED</h2>
             </div>

@@ -16,6 +16,9 @@ const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const appendFile = util.promisify(fs.appendFile);
 const productsFilePath = path.join(__dirname, 'data', 'products.txt');
+const multer = require('multer'); // Import multer
+const upload = multer({ dest: 'uploads/' }); // Temporary upload directory
+
 
 async function checkAuthentication(username, password) {
     try {
@@ -465,6 +468,93 @@ app.post('/updateOrderStatus', async (req, res) => {
     } catch (error) {
         console.error("Error updating order status:", error);
         res.status(500).json({ success: false, message: "Error updating order status." });
+    }
+});
+
+// ADMIN DELETE PRODUCT
+app.delete('/deleteProduct', async (req, res) => {
+    const { productId } = req.body;
+    try {
+        let productsData = await fs.promises.readFile(productsFilePath, 'utf8');
+        const productBlocks = productsData.trim().split(/\r?\n\r?\n/);
+        const filteredProducts = productBlocks.filter(block => !block.startsWith(productId + '\t'));
+
+        await fs.promises.writeFile(productsFilePath, filteredProducts.join('\n\n') + '\n');
+        res.json({ success: true, message: "Product deleted successfully." });
+    } catch (error) {
+        console.error("Error deleting product:", error);
+        res.status(500).json({ success: false, message: "Error deleting product." });
+    }
+});
+
+// Endpoint to add a product and upload an image
+app.post('/addProduct', upload.single('image'), async (req, res) => {
+    if (!req.file || req.file.mimetype !== 'image/jpeg') {
+        return res.status(400).json({ success: false, message: "Only JPEG images are accepted." });
+    }
+
+    const product = JSON.parse(req.body.product);
+    const { id, name, price, quantity, description } = product;
+    const image = req.file; // Access the uploaded file from req.file
+
+    // Rename and move the file to the public/images directory
+    const targetPath = path.join(__dirname, '../client/public/images', `${id}.jpg`);
+
+    fs.rename(image.path, targetPath, async (err) => {
+    if (err) {
+        console.error("Error saving the image:", err);
+        return res.status(500).json({ success: false, message: "Error saving the image." });
+    }
+
+    // Read existing products
+    const productsFilePath = path.join(__dirname, 'data', 'products.txt');
+    try {
+        const data = await fs.promises.readFile(productsFilePath, 'utf8');
+        const productBlocks = data.trim().split(/\r?\n\r?\n/);
+        const products = productBlocks.map(block => {
+            const lines = block.split(/\r?\n/);
+            const [id, name, price, quantity] = lines[0].split('\t');
+            const description = lines.slice(1).join(' '); // Join the rest as description
+            return { id, name, price, quantity, description };
+        });
+
+        // Add new product
+        products.push({ id, name, price, quantity, description });
+
+        // Sort products by ID
+        products.sort((a, b) => a.id.localeCompare(b.id));
+
+        // Format products for file writing
+        const formattedProducts = products.map(product => `${product.id}\t${product.name}\t${product.price}\t${product.quantity}\n${product.description}`).join('\n\n');
+
+        // Write sorted products back to the file
+        await fs.promises.writeFile(productsFilePath, formattedProducts + '\n');
+
+        res.json({ success: true, message: "Product added and sorted successfully." });
+    } catch (readError) {
+        console.error("Error reading or writing the products file:", readError);
+        res.status(500).json({ success: false, message: "Error processing products file." });
+    }
+    });
+});
+
+app.post('/editProduct', async (req, res) => {
+    const { id, name, price, quantity, description } = req.body;
+    try {
+    let productsData = await fs.promises.readFile(productsFilePath, 'utf8');
+    let productBlocks = productsData.trim().split(/\r?\n\r?\n/);
+    const updatedProducts = productBlocks.map(block => {
+        if (block.startsWith(id + '\t')) {
+        return `${id}\t${name}\t${price}\t${quantity}\n${description}`;
+        }
+        return block;
+    }).join('\n\n');
+
+    await fs.promises.writeFile(productsFilePath, updatedProducts + '\n');
+    res.json({ success: true, message: "Product updated successfully." });
+    } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({ success: false, message: "Error updating product." });
     }
 });
 

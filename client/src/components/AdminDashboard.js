@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css'; // Ensure this path matches your CSS file's location
 import SearchBar from './SearchBar'; // Adjust the path as necessary
+import { useDropzone } from 'react-dropzone'; // Import useDropzone hook from react-dropzone
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -9,7 +10,37 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showAddProductForm, setShowAddProductForm] = useState(false);
+  const [file, setFile] = useState(null); // State to hold the uploaded file
+  const [preview, setPreview] = useState(''); // State to hold the preview URL
+
+  // Dropzone hook
+  const {
+    getRootProps,
+    getInputProps,
+    isDragAccept,
+    isDragReject
+  } = useDropzone({
+    accept: 'image/jpeg',
+    onDrop: (acceptedFiles, fileRejections) => {
+      if (fileRejections.length > 0) {
+        alert('Only JPEG images are accepted.');
+      } else if (acceptedFiles.length > 0) {
+        const file = acceptedFiles[0];
+        setPreview(URL.createObjectURL(file));
+      }
+    }
+  });
+
+   // Function to remove the image preview
+  const removeImage = (event) => {
+    event.stopPropagation(); // Prevent click event from reaching the dropzone input
+    setPreview('');
+  };
 
   // Function to fetch users from the backend
   const fetchUsers = async () => {
@@ -27,7 +58,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // New function to fetch orders
+  // Function to fetch orders from the backend
   const fetchOrders = async () => {
     try {
       const response = await fetch('http://localhost:3000/orders');
@@ -40,6 +71,22 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error("Error fetching orders:", error);
       alert('Failed to fetch orders');
+    }
+  };
+
+  // Function to fetch products from the backend
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/products');
+      const data = await response.json();
+      if (data.success) {
+        setProducts(data.products);
+      } else {
+        alert('Failed to fetch products');
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      alert('Failed to fetch products');
     }
   };
 
@@ -66,6 +113,40 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleAddProduct = async (e) => {
+    e.preventDefault();
+    const newProduct = {
+      id: e.target.id.value,
+      name: e.target.name.value,
+      price: e.target.price.value,
+      quantity: e.target.quantity.value,
+      description: e.target.description.value,
+    };
+
+    const formData = new FormData();
+    formData.append('product', JSON.stringify(newProduct));
+    formData.append('image', file);
+
+    try {
+      const response = await fetch('http://localhost:3000/addProduct', {
+        method: 'POST',
+        body: formData,
+        body: formData, // Send formData
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('Product added successfully');
+        setShowAddProductForm(false); // Hide the form
+        fetchProducts(); // Refresh the products list
+      } else {
+        alert('Failed to add product');
+      }
+    } catch (error) {
+      console.error("Error adding product:", error);
+      alert('Failed to add product');
+    }
+  };
+
   useEffect(() => {
     if (displaySection === 'users') {
       fetchUsers();
@@ -74,15 +155,11 @@ const AdminDashboard = () => {
     }
   }, [displaySection]);
 
-  const handleDisplaySection = (section) => {
-    setDisplaySection(section);
-    setSelectedUser(null); // Reset selected user when changing sections
-  };
-
   const handleSelectUser = (user) => {
     setSelectedUser(user); // Set the selected user to display details
   };
 
+  // Function to delete a user
   const handleDeleteUser = async (username) => {
     const isConfirmed = window.confirm(`Are you sure you want to delete the user ${username}? This action cannot be undone.`);
     if (!isConfirmed) {
@@ -112,18 +189,108 @@ const AdminDashboard = () => {
     }
   };
 
+  // Function to delete a product
+  const handleDeleteProduct = async (productId) => {
+    const isConfirmed = window.confirm("Are you sure you want to delete this product? This action cannot be undone.");
+    if (!isConfirmed) {
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/deleteProduct', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productId }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('Product deleted successfully');
+        fetchProducts(); // Refresh the products list
+      } else {
+        alert('Failed to delete product');
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      alert('Failed to delete product');
+    }
+  };
+
+  // Function to handle the edit form submission
+  const handleEditProduct = async (e) => {
+    e.preventDefault();
+    const updatedProduct = {
+      id: selectedProduct.id,
+      name: e.target.name.value,
+      price: e.target.price.value,
+      quantity: e.target.quantity.value,
+      description: e.target.description.value,
+    };
+
+    try {
+      const response = await fetch('http://localhost:3000/editProduct', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedProduct),
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('Product updated successfully');
+        setSelectedProduct(updatedProduct);
+        fetchProducts(); // Refresh the products list
+        setIsEditing(false); // Close the edit form
+      } else {
+        alert('Failed to update product');
+      }
+    } catch (error) {
+      console.error("Error updating product:", error);
+      alert('Failed to update product');
+    }
+  };
+
+  // Function to sign out
   const handleSignOut = () => {
     localStorage.clear();
     navigate('/login');
   };
 
+  // Function to handle search query changes
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
 
+  const handleDisplaySection = (section) => {
+    setDisplaySection(section);
+    setSelectedUser(null); // Reset selected user when changing sections
+  };
+
+  // Filtered lists based on search query
   const filteredOrders = orders.filter(order => 
     order.orderID.includes(searchQuery) || order.username.includes(searchQuery)
   );
+
+  const filteredProducts = products.filter(product =>
+    product.id.includes(searchQuery) ||
+    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSelectProduct = (product) => {
+    setSelectedProduct(product);
+  };
+
+  useEffect(() => {
+    if (displaySection === 'users') {
+      fetchUsers();
+    } else if (displaySection === 'orders') {
+      fetchOrders();
+    } else if (displaySection === 'products') {
+      fetchProducts();
+    }
+  }, [displaySection]);
 
   return (
     <div className="admin-dashboard">
@@ -136,7 +303,7 @@ const AdminDashboard = () => {
         <button onClick={handleSignOut} className="admin-sign-out-button">Sign Out</button>
       </div>
       {displaySection === 'users' && (
-        <div className="admin-users-content"> {/* Flex container for users list and details */}
+        <div className="admin-users-content">
           <div className="user-list">
             {users.map((user, index) => (
               <div key={index} className="user-item">
@@ -157,7 +324,7 @@ const AdminDashboard = () => {
               <p>{selectedUser.firstName}</p>
               <p className="detail-heading">Last Name:</p>
               <p>{selectedUser.lastName}</p>
-              {selectedUser.username !== "admin" && ( // Conditionally render the delete button
+              {selectedUser.username !== "admin" && (
                 <button onClick={() => handleDeleteUser(selectedUser.username)} className="delete-user-button">Delete User</button>
               )}
             </div>
@@ -190,12 +357,82 @@ const AdminDashboard = () => {
                   <option value="Pending">Pending</option>
                   <option value="Shipped">Shipped</option>
                   <option value="Delivered">Delivered</option>
-                  </select>
+                </select>
               </div>
             ))}
           </div>
         </>
       )}
+      {displaySection === 'products' && (
+  <>
+    {!showAddProductForm && !selectedProduct ? (
+      <>
+        <div className="search-bar-centering-container">
+          <SearchBar onSearch={handleSearch} placeholder="Search for products..." />
+          <button onClick={() => setShowAddProductForm(true)} className="add-product-button">Add Product</button>
+        </div>
+        <div className="products-list">
+          {filteredProducts.map((product, index) => (
+            <div key={index} className="product-item">
+              <img src={`/images/${product.id}.jpg`} alt={product.name} style={{ width: '100%', height: 'auto' }} />
+              <p>{product.name}</p>
+              <p>Price: {product.price} AED</p>
+              <button onClick={() => handleSelectProduct(product)} className="details-button">View Details</button>
+              <button onClick={() => handleDeleteProduct(product.id)} className="delete-user-button">Delete</button>
+            </div>
+          ))}
+        </div>
+      </>
+    ) : showAddProductForm ? (
+      <form onSubmit={handleAddProduct} className="add-product-form">
+        <input type="text" name="id" placeholder="ID" required />
+        <input type="text" name="name" placeholder="Name" required />
+        <input type="number" name="price" placeholder="Price" required />
+        <input type="number" name="quantity" placeholder="Quantity" required />
+        <textarea name="description" placeholder="Description" required></textarea>
+        <div {...getRootProps({ 
+            className: `dropzone ${isDragAccept ? 'dropzone--is-drag-accept' : ''} ${isDragReject ? 'dropzone--is-drag-reject' : ''}`
+          })}>
+          <input {...getInputProps()} />
+          <p>Drag 'n' drop some files here, or click to select files</p>
+          {preview && (
+          <div className="image-preview-container">
+            <img src={preview} alt="Preview" style={{ width: '100px', height: '100px' }} />
+            <button onClick={removeImage} className="remove-image-button">X</button>
+          </div>
+        )}
+        </div>
+        <button type="submit" className="save-changes-button">Submit</button>
+        <button type="button" onClick={() => setShowAddProductForm(false)} className="back-button">Back to Products</button>
+      </form>
+    ) : selectedProduct && (
+      <div className="product-details">
+        <img src={`/images/${selectedProduct.id}.jpg`} alt={selectedProduct.name} className="product-detail-image" />
+        <div className="product-details-text">
+          <h2>{selectedProduct.name}</h2>
+          <p>ID: {selectedProduct.id}</p>
+          <p>Price: {selectedProduct.price}</p>
+          <p>Quantity: {selectedProduct.quantity}</p>
+          <p>Description: {selectedProduct.description}</p>
+          <button onClick={() => setSelectedProduct(null)} className="back-button">Back to Products</button>
+          {!isEditing && (
+            <button onClick={() => setIsEditing(true)} className="edit-product-button">Edit</button>
+          )}
+          {isEditing && (
+            <form onSubmit={handleEditProduct}>
+              <input type="text" name="name" defaultValue={selectedProduct.name} />
+              <input type="number" name="price" defaultValue={selectedProduct.price} />
+              <input type="number" name="quantity" defaultValue={selectedProduct.quantity} />
+              <textarea name="description" defaultValue={selectedProduct.description}></textarea>
+              <button type="submit" className="save-changes-button">Save Changes</button>
+              <button type="button" onClick={() => setIsEditing(false)} className="cancel-button">Cancel</button>
+          </form>
+          )}
+        </div>
+      </div>
+    )}
+  </>
+)}
     </div>
   );
 };

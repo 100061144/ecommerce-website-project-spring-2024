@@ -81,7 +81,7 @@
   background-color: #e0a800;
 }
 
-.delete-user-button {
+.delete-user-button, .delete-product-button {
   padding: 10px 20px;
   background-color: #dc3545;
   color: white;
@@ -90,7 +90,7 @@
   cursor: pointer;
 }
 
-.delete-user-button:hover {
+.delete-user-button:hover, .delete-product-button:hover {
   background-color: #c82330;
 }
 
@@ -116,7 +116,7 @@
   margin-bottom: 5px; /* Space between heading and content */
 }
 
-.delete-user-button {
+.delete-user-button, .delete-product-button {
   display: block; /* Makes the button take the full width */
   width: 100%; /* Full width of the container */
   margin-top: 20px; /* Adds space above the delete button */
@@ -124,19 +124,254 @@
   font-size: 16px; /* Larger font size for the button text */
 }
 
-/* Ensure the search bar container fills its line and centers the search bar within it */
-.search-bar-container {
+/* Ensures the products list container fills its available horizontal space */
+.products-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Adjust column width as needed */
+  gap: 20px; /* Space between grid items */
+  justify-content: center; /* Center grid items */
+  padding: 20px 40px; /* Increase horizontal padding */
+  margin: 0 auto; /* Center the grid in the middle of the page */
+  max-width: 1200px; /* Adjust maximum width as needed */
+}
+
+.product-item {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center; /* Centers items vertically in the container */
+  padding: 20px; /* Adds padding inside each product item for spacing */
+  border: 1px solid #ccc; /* Optional: Adds a border for visual separation */
+  border-radius: 5px; /* Optional: Rounds the corners of the product item */
+  background-color: #f9f9f9; /* Optional: Sets a background color for product items */
+}
+
+.product-item img {
+  width: 80%; /* Makes the image responsive within its container */
+  max-width: 150px; /* Sets a max-width to control image size */
+  height: auto; /* Maintains aspect ratio */
+  margin-bottom: 15px; /* Space below the image */
+}
+
+.product-details {
+  display: flex;
+  align-items: start;
+  gap: 20px;
+  padding: 20px;
+  background-color: #f9f9f9; /* Light background for the details area */
+  border-radius: 8px; /* Rounded corners for the details box */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+  width: 80%; /* Increase the width of the container */
+  max-width: 1200px; /* Adjust max-width as needed */
+  margin: 0 auto; /* Center the container */
+}
+
+.product-detail-image {
+  width: 70%; /* Makes the image responsive within its container */
+  max-width: 450px; /* Sets a max-width to control image size */
+  height: auto; /* Maintains aspect ratio */
+  margin-bottom: 15px; /* Space below the image */
+  border-radius: 5px; /* Soften the edges of the image */
+}
+
+.product-details-text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Space between text elements */
+}
+
+.product-details-text h2 {
+  color: #007bff; /* Theme primary color for the product name */
+  margin: 0;
+  font-size: 28px; /* Larger font size for product name */
+}
+
+.product-details-text p {
+  color: #333; /* Darker text for better contrast */
+  margin: 0;
+  font-size: 20px; /* Readable text size */
+}
+
+.product-details-text .back-button {
+  padding: 10px 20px;
+  background-color: #007bff; /* Theme primary color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.product-details-text .back-button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
+/* Targeting the edit button specifically within the admin dashboard */
+.admin-dashboard .edit-product-button {
+  padding: 10px 20px;
+  margin: 5px;
+  color: white;
+  background-color: #28a745; /* Green background to distinguish it as an edit button */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-dashboard .edit-product-button:hover {
+  background-color: #218838; /* Slightly darker green on hover */
+}
+
+/* Styling for the "Save Changes" button */
+.admin-dashboard .save-changes-button {
+  padding: 10px 20px;
+  margin: 5px;
+  color: white;
+  background-color: #28a745; /* Green background */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-dashboard .save-changes-button:hover {
+  background-color: #218838; /* Slightly darker green on hover */
+}
+
+/* Styling for the "Cancel" button */
+.admin-dashboard .cancel-button {
+  padding: 10px 20px;
+  margin: 5px;
+  color: white;
+  background-color: #007bff; /* Blue background */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-dashboard .cancel-button:hover {
+  background-color: #0056b3; /* Slightly darker blue on hover */
+}
+
+/* Targeting forms specifically within the product details section */
+.product-details form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.details-button, .delete-user-button {
+  width: auto; /* Allows the button to size according to its content */
+  padding: 10px 20px; /* Original padding */
+  margin-top: 10px; /* Space above the button */
+  font-size: 16px; /* Ensures text is legible */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Hover effects for buttons, ensuring they match your design preferences */
+.details-button:hover, .delete-user-button:hover {
+  opacity: 0.8; /* Example hover effect */
+}
+
+/* Adjust the container to place the search bar and the "Add Product" button on the same line */
+.search-and-add-container {
+  display: flex;
+  justify-content: space-between; /* This will keep the search bar and button spaced apart */
+  align-items: center;
   width: 100%;
   margin-top: 20px; /* Adjust spacing as needed */
 }
 
-/* If the SearchBar component itself can be styled directly, adjust its class styling */
-.search-bar {
-  width: 50%; /* Adjust this to control the search bar width */
-  max-width: 600px; /* Prevents the search bar from becoming too wide */
-  margin: 0 auto; /* Centers the search bar if its width is less than 100% */
+/* Container for both the search bar and the "Add Product" button */
+.search-and-add-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Container for both the search bar and the "Add Product" button, centered */
+.search-bar-centering-container {
+  display: flex;
+  justify-content: center; /* Center the container itself */
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Adjust the button styles if needed */
+.add-product-button {
+  margin-left: 10px; /* Adds some space between the search bar and the button */
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-product-button:hover {
+  background-color: #0056b3;
+}
+
+/* General form styling */
+.add-product-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 500px; /* Adjust based on your preference */
+  margin: 20px auto; /* Center the form on the page */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Subtle shadow for depth */
+  background-color: #fff; /* White background */
+}
+
+.add-product-form input[type="text"],
+.add-product-form input[type="number"],
+.add-product-form textarea {
+  padding: 10px;
+  margin-bottom: 15px; /* Space between form fields */
+  border: 1px solid #ccc; /* Light grey border */
+  border-radius: 4px; /* Slightly rounded corners */
+}
+
+.add-product-form textarea {
+  resize: vertical; /* Allow vertical resizing */
+  height: 100px; /* Initial height */
+}
+
+/* Styling for form buttons */
+.add-product-form .save-changes-button,
+.add-product-form .back-button {
+  padding: 10px 20px;
+  margin-right: 10px; /* Space between buttons */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px; /* Larger font size */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.add-product-form .save-changes-button {
+  background-color: #28a745; /* Green background */
+  color: white;
+}
+
+.add-product-form .back-button {
+  background-color: #007bff; /* Blue background */
+  color: white;
+}
+
+.add-product-form .save-changes-button:hover {
+  background-color: #218838; /* Darker green on hover */
+}
+
+.add-product-form .back-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
 }
 
 /* Style the orders list for a grid layout */
@@ -174,4 +409,78 @@
 
 .order-item select option {
   padding: 5px 0; /* Adds some vertical padding to each option for better readability */
+}
+
+/* Add or update these styles */
+.products-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Creates three columns */
+  gap: 20px; /* Adjusts the gap between items */
+  padding: 10px;
+}
+
+.product-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.product-item img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+/* Adjust the button styles if needed */
+.details-button, .delete-user-button, .delete-product-button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Styles for the dropzone */
+/* Existing styles for .dropzone */
+
+.dropzone {
+  border: 2px dashed #007bff;
+  padding: 20px;
+  text-align: center;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.dropzone--is-drag-accept {
+  border-color: #28a745; /* Green to indicate acceptance */
+}
+
+.dropzone--is-drag-reject {
+  border-color: #dc3545; /* Red to indicate rejection */
+}
+
+.image-preview-container {
+  position: relative;
+  display: inline-block;
+}
+
+.remove-image-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 25px;
+  height: 25px;
+  font-weight: bold;
+}
+
+.remove-image-button:hover {
+  background-color: darkred;
 }
