@@ -23,7 +23,8 @@ const Catalogue = () => {
       subSections: [
         { name: 'Kandoora', idPrefix: '101-00', image: '/images/men_kandoora.jpg' },
         { name: 'Ghutra', idPrefix: '101-01', image: '/images/men_ghutra.jpg' },
-        { name: 'Agal', idPrefix: '101-02', image: '/images/men_agal.jpeg' },
+        { name: 'Agal', idPrefix: '101-02', image: '/images/men_agal.jpg' },
+        { name: 'Sandal', idPrefix: '101-03', image: '/images/men_sandal.jpg' },
       ],
     },
     {
@@ -59,15 +60,6 @@ const Catalogue = () => {
     transition: 'transform 0.2s ease-in-out',
   };
 
-  const commonSubSectionStyle = {
-    ...commonStyle,
-    height: '150px',
-    width: '150px',
-    margin: '10px',
-    transition: 'transform 0.2s ease-in-out',
-    cursor: 'pointer',
-  };
-
   return (
     <div className="catalogue-container">
       <Link to="/" className="home-button">Home</Link>
@@ -84,19 +76,20 @@ const Catalogue = () => {
           </div>
         ))}
       </div>
-      {sectionsData
-        .find((section) => section.name === activeSection)?.subSections
-        .map((subSection) => (
-          <div key={subSection.name} className="sub-sections-container">
+      <div className="sub-sections-container">
+        {sectionsData
+          .find((section) => section.name === activeSection)
+          ?.subSections.map((subSection) => (
             <div
-              style={{ backgroundImage: `url(${subSection.image})`, ...commonSubSectionStyle }}
+              key={subSection.name}
               className="catalogue-sub-section"
+              style={{ backgroundImage: `url(${subSection.image})` }}
               onClick={() => handleSubSectionClick(subSection.idPrefix)}
             >
               {subSection.name}
             </div>
-          </div>
-        ))}
+          ))}
+      </div>
     </div>
   );
 };

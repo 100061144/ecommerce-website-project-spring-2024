@@ -19,6 +19,15 @@ A black agal headress for men.
 101-022	Black Agal with Tail	60	10
 A tailed-black agal headress for men.
 
+101-031	White Sandal	350	10
+A white sandal for men.
+
+101-032	Brown Sandal	350	10
+A brown sandal for men.
+
+101-033	Black Sandal	350	10
+A black sandal for men.
+
 102-001	Black Abaya	220	10
 A black abaya for women.
 

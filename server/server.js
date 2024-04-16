@@ -19,6 +19,16 @@ const productsFilePath = path.join(__dirname, 'data', 'products.txt');
 const multer = require('multer'); // Import multer
 const upload = multer({ dest: 'uploads/' }); // Temporary upload directory
 
+// Function to round a number to n decimal places
+function roundTo(n, digits) {
+    if (digits === undefined) {
+        digits = 0;
+    }
+
+    const multiplicator = Math.pow(10, digits);
+    n = parseFloat((n * multiplicator).toFixed(11));
+    return Math.round(n) / multiplicator;
+}
 
 async function checkAuthentication(username, password) {
     try {
@@ -403,6 +413,150 @@ app.get('/orders/:username', async (req, res) => {
     } catch (error) {
         console.error("Error reading the order or product files:", error);
         res.status(500).json({ success: false, message: "Error processing the order history." });
+    }
+});
+
+app.get('/analytics', async (req, res) => {
+    try {
+        const ordersData = await readFile(path.join(__dirname, 'data', 'orders.txt'), 'utf8');
+        const productsData = await readFile(path.join(__dirname, 'data', 'products.txt'), 'utf8');
+
+        // Splitting the data into lines and then processing
+        const ordersLines = ordersData.trim().split('\n\n');
+        const productLines = productsData.trim().split('\n\n');
+
+        // Creating a map of product IDs to product names and quantities
+        // Assuming this part is correct and included in the server.js
+        const productMap = productLines.reduce((acc, block) => {
+            const lines = block.split('\n');
+            const [id, name, price, quantity] = lines[0].split('\t');
+            acc[id] = { name, price: parseFloat(price), quantity: parseInt(quantity, 10) };
+            return acc;
+        }, {});
+
+        // Counting orders and quantities for each product
+        const productCounts = {};
+        ordersLines.forEach(order => {
+        const productIDs = order.split('\n')[1].split('\t');
+        productIDs.forEach(id => {
+            const [productId, quantity] = id.split('(');
+            const parsedQuantity = parseInt(quantity, 10);
+            if (productMap[productId]) {
+                if (!productCounts[productId]) {
+                    productCounts[productId] = {
+                    orderCount: 0,
+                    totalOrdered: 0,
+                    };
+                }
+                productCounts[productId].orderCount += 1;
+                productCounts[productId].totalOrdered += parsedQuantity;
+            }
+        });
+        });
+
+        // Preparing analytics data
+    const analytics = {
+        mostOrderedProduct: null,
+        leastOrderedProduct: null,
+        mostQuantityOrderedProduct: null,
+        leastQuantityOrderedProduct: null,
+    };
+
+    Object.entries(productCounts).forEach(([productId, counts]) => {
+        const product = productMap[productId];
+        if (product) {
+        if (!analytics.mostOrderedProduct || counts.orderCount > analytics.mostOrderedProduct.orderCount) {
+            analytics.mostOrderedProduct = { ...product, ...counts };
+        }
+        if (!analytics.leastOrderedProduct || counts.orderCount < analytics.leastOrderedProduct.orderCount) {
+            analytics.leastOrderedProduct = { ...product, ...counts };
+        }
+        if (!analytics.mostQuantityOrderedProduct || counts.totalOrdered > analytics.mostQuantityOrderedProduct.totalOrdered) {
+            analytics.mostQuantityOrderedProduct = { ...product, ...counts };
+        }
+        if (!analytics.leastQuantityOrderedProduct || counts.totalOrdered < analytics.leastQuantityOrderedProduct.totalOrdered) {
+            analytics.leastQuantityOrderedProduct = { ...product, ...counts };
+        }
+        }
+    });
+
+        // Initialize variables for additional analytics
+        let highestTotalPriceOrder = { orderID: null, totalPrice: 0 };
+        let lowestTotalPriceOrder = { orderID: null, totalPrice: Infinity };
+
+        ordersLines.forEach(order => {
+            const lines = order.split('\n');
+            const [orderID, , , totalPrice] = lines[0].split('\t');
+            const price = parseFloat(totalPrice);
+
+            // Check for highest total price order
+            if (price > highestTotalPriceOrder.totalPrice) {
+                highestTotalPriceOrder = { orderID, totalPrice: price };
+            }
+
+            // Check for lowest total price order
+            if (price < lowestTotalPriceOrder.totalPrice) {
+                lowestTotalPriceOrder = { orderID, totalPrice: price };
+            }
+        });
+
+        // Find the product with the least quantity ordered
+        let leastQuantityOrderedProduct = null;
+            Object.entries(productCounts).forEach(([productId, counts]) => {
+            const product = productMap[productId];
+            if (product) {
+                if (!leastQuantityOrderedProduct || counts.totalOrdered < leastQuantityOrderedProduct.totalOrdered) {
+                    leastQuantityOrderedProduct = { ...product, ...counts };
+                }
+            }
+        });
+
+        // Adding new metrics to the analytics object
+        analytics.leastQuantityOrderedProduct = leastQuantityOrderedProduct;
+        analytics.highestTotalPriceOrder = highestTotalPriceOrder;
+        analytics.lowestTotalPriceOrder = lowestTotalPriceOrder;
+        
+
+        // Calculate AOV (Average Order Value)
+        const totalRevenue = ordersLines.reduce((acc, order) => {
+            const lines = order.split('\n');
+            const totalPrice = parseFloat(lines[0].split('\t')[3]);
+            return acc + totalPrice;
+        }, 0);
+        const aov = roundTo(totalRevenue / ordersLines.length, 2); // Round to 2 decimal places
+
+        // Calculate Sales by Product Category
+        const salesByCategory = ordersLines.reduce((acc, order) => {
+            const lines = order.split('\n');
+            const productsLine = lines[1];
+            const productIDs = productsLine.split('\t');
+        
+            productIDs.forEach(idWithQuantity => {
+                const [productId, quantityPart] = idWithQuantity.split('(');
+                const quantity = parseInt(quantityPart, 10); // Correctly parse the quantity
+                const product = productMap[productId];
+        
+                if (product) {
+                    const category = productId.split('-')[0];
+                    if (!acc[category]) {
+                        acc[category] = { totalQuantity: 0, totalSales: 0.0 };
+                    }
+                    acc[category].totalQuantity += quantity;
+                    acc[category].totalSales += roundTo(product.price * quantity, 2);
+                }
+            });
+        
+            return acc;
+        }, {});
+
+        // Adding new metrics to the analytics object
+        analytics.aov = roundTo(aov, 2);
+        analytics.salesByCategory = salesByCategory;
+
+        res.json({ success: true, analytics });
+    } catch (error) {
+        console.error("Error generating analytics:", error);
+        res.status(500).json({ success: false, message: "Error processing analytics data." });
     }
 });
 

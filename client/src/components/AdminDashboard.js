@@ -17,6 +17,23 @@ const AdminDashboard = () => {
   const [showAddProductForm, setShowAddProductForm] = useState(false);
   const [file, setFile] = useState(null); // State to hold the uploaded file
   const [preview, setPreview] = useState(''); // State to hold the preview URL
+  const [analytics, setAnalytics] = useState(null);
+
+  const fetchAnalytics = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/analytics');
+      const data = await response.json();
+      if (data.success) {
+        setAnalytics(data.analytics);
+      } else {
+        alert('Failed to fetch analytics');
+      }
+    } catch (error) {
+      console.error("Error fetching analytics:", error);
+      alert('Failed to fetch analytics');
+    }
+  };
+
 
   // Dropzone hook
   const {
@@ -289,6 +306,8 @@ const AdminDashboard = () => {
       fetchOrders();
     } else if (displaySection === 'products') {
       fetchProducts();
+    } else if (displaySection === 'analytics') {
+      fetchAnalytics();
     }
   }, [displaySection]);
 
@@ -363,6 +382,24 @@ const AdminDashboard = () => {
           </div>
         </>
       )}
+      {displaySection === 'analytics' && analytics && (
+    <div className="analytics-container">
+        <h2>Analytics</h2>
+        <p><strong>Most Ordered Product:</strong> {analytics.mostOrderedProduct.name} (Orders: {analytics.mostOrderedProduct.orderCount})</p>
+    <p><strong>Least Ordered Product:</strong> {analytics.leastOrderedProduct.name} (Orders: {analytics.leastOrderedProduct.orderCount})</p>
+    <p><strong>Product with Most Quantity Ordered:</strong> {analytics.mostQuantityOrderedProduct.name} (Quantity: {analytics.mostQuantityOrderedProduct.totalOrdered})</p>
+    <p><strong>Product with Least Quantity Ordered:</strong> {analytics.leastQuantityOrderedProduct.name} (Quantity: {analytics.leastQuantityOrderedProduct.totalOrdered})</p>
+        <p><strong>Order with the Highest Total Price:</strong> {analytics.highestTotalPriceOrder.orderID} (Total Price: {analytics.highestTotalPriceOrder.totalPrice} AED)</p>
+        <p><strong>Order with the Lowest Total Price:</strong> {analytics.lowestTotalPriceOrder.orderID} (Total Price: {analytics.lowestTotalPriceOrder.totalPrice} AED)</p>
+        <p><strong>Average Order Value (AOV):</strong> {analytics.aov} AED</p>
+        <h3>Sales by Product Category:</h3>
+        <ul>
+            {Object.entries(analytics.salesByCategory).map(([category, data]) => (
+                <li key={category}><strong>Category {category}:</strong> {data.totalQuantity} items sold, Total Sales: {data.totalSales} AED</li>
+            ))}
+        </ul>
+    </div>
+)}
       {displaySection === 'products' && (
   <>
     {!showAddProductForm && !selectedProduct ? (

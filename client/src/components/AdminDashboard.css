@@ -484,3 +484,50 @@
 .remove-image-button:hover {
   background-color: darkred;
 }
+
+.analytics-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.analytics-container h2 {
+  color: #333;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.analytics-container h3 {
+  color: #666;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.analytics-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.analytics-container ul li {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.analytics-container p, .analytics-container ul li {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.analytics-container p span, .analytics-container ul li span {
+  font-weight: bold;
+  color: #007bff;
+}
