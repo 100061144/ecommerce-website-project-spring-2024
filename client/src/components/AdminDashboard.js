@@ -48,6 +48,7 @@ const AdminDashboard = () => {
         alert('Only JPEG images are accepted.');
       } else if (acceptedFiles.length > 0) {
         const file = acceptedFiles[0];
+        setFile(file);
         setPreview(URL.createObjectURL(file));
       }
     }
@@ -130,6 +131,9 @@ const AdminDashboard = () => {
     }
   };
 
+  // Assuming this state exists and is updated by the file input's onChange handler
+// const [file, setFile] = useState(null);
+
   const handleAddProduct = async (e) => {
     e.preventDefault();
     const newProduct = {
@@ -142,13 +146,18 @@ const AdminDashboard = () => {
 
     const formData = new FormData();
     formData.append('product', JSON.stringify(newProduct));
-    formData.append('image', file);
+    if (file) {
+        console.log(file); // Add this right before appending the file to FormData
+        formData.append('image', file); // Make sure 'image' matches the key expected by Multer
+    } else {
+        alert('Please select an image to upload.');
+        return; // Exit the function if no file is selected
+    }
 
     try {
       const response = await fetch('http://localhost:3000/addProduct', {
         method: 'POST',
-        body: formData,
-        body: formData, // Send formData
+        body: formData, // Send formData without setting Content-Type header
       });
       const data = await response.json();
       if (data.success) {
@@ -386,9 +395,9 @@ const AdminDashboard = () => {
     <div className="analytics-container">
         <h2>Analytics</h2>
         <p><strong>Most Ordered Product:</strong> {analytics.mostOrderedProduct.name} (Orders: {analytics.mostOrderedProduct.orderCount})</p>
-    <p><strong>Least Ordered Product:</strong> {analytics.leastOrderedProduct.name} (Orders: {analytics.leastOrderedProduct.orderCount})</p>
-    <p><strong>Product with Most Quantity Ordered:</strong> {analytics.mostQuantityOrderedProduct.name} (Quantity: {analytics.mostQuantityOrderedProduct.totalOrdered})</p>
-    <p><strong>Product with Least Quantity Ordered:</strong> {analytics.leastQuantityOrderedProduct.name} (Quantity: {analytics.leastQuantityOrderedProduct.totalOrdered})</p>
+        <p><strong>Least Ordered Product:</strong> {analytics.leastOrderedProduct.name} (Orders: {analytics.leastOrderedProduct.orderCount})</p>
+        <p><strong>Product with Most Quantity Ordered:</strong> {analytics.mostQuantityOrderedProduct.name} (Quantity: {analytics.mostQuantityOrderedProduct.totalOrdered})</p>
+        <p><strong>Product with Least Quantity Ordered:</strong> {analytics.leastQuantityOrderedProduct.name} (Quantity: {analytics.leastQuantityOrderedProduct.totalOrdered})</p>
         <p><strong>Order with the Highest Total Price:</strong> {analytics.highestTotalPriceOrder.orderID} (Total Price: {analytics.highestTotalPriceOrder.totalPrice} AED)</p>
         <p><strong>Order with the Lowest Total Price:</strong> {analytics.lowestTotalPriceOrder.orderID} (Total Price: {analytics.lowestTotalPriceOrder.totalPrice} AED)</p>
         <p><strong>Average Order Value (AOV):</strong> {analytics.aov} AED</p>
@@ -398,6 +407,17 @@ const AdminDashboard = () => {
                 <li key={category}><strong>Category {category}:</strong> {data.totalQuantity} items sold, Total Sales: {data.totalSales} AED</li>
             ))}
         </ul>
+        <h2>Rating Analytics</h2>
+        {analytics.bestRatedProduct && (
+            <p>
+                <strong>Best Rated Product:</strong> {analytics.bestRatedProduct.productName} ({analytics.bestRatedProduct.productId}) - Average Rating: {analytics.bestRatedProduct.averageRating}
+            </p>
+        )}
+        {analytics.worstRatedProduct && (
+            <p>
+                <strong>Worst Rated Product:</strong> {analytics.worstRatedProduct.productName} ({analytics.worstRatedProduct.productId}) - Average Rating: {analytics.worstRatedProduct.averageRating})
+            </p>
+        )}
     </div>
 )}
       {displaySection === 'products' && (

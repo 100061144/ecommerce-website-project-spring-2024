@@ -1,12 +1,12 @@
 // Signup.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Signup.css'; // Ensure this path is correct
+import './Signup.css';
 
 const Signup = () => {
   const [userDetails, setUserDetails] = useState({
     username: '',
-    password: '', // Ensure you have a password field in your form
+    password: '',
     email: '',
     phoneNumber: '',
     firstName: '',
@@ -24,24 +24,28 @@ const Signup = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch('http://localhost:3000/signup', { // Adjust the URL/port as necessary
+    fetch('http://localhost:3000/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userDetails),
     })
     .then(response => {
       if (response.ok) {
-        return response.text();
+          return response.json();
       }
       throw new Error('Failed to sign up.');
     })
-    .then(() => {
-      alert('Signed up successfully.');
-      navigate('/login'); // Redirect to login page after successful signup
+    .then(data => {
+      if (data.success) {
+          alert(data.message);
+          navigate('/login'); // Redirect to login page after successful signup
+      } else {
+          alert(data.message); // Display the error message from the server
+      }
     })
     .catch(error => {
       console.error('Signup error:', error);
-      alert('Error signing up.');
+      alert('Error signing up.'); // Display a generic error message
     });
   };
 

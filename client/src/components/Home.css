@@ -28,3 +28,11 @@
 .home-button:hover {
     background-color: #0056b3;
 }
+
+/* Home.css */
+.home-banner {
+    width: 100%; /* Adjust the width as necessary */
+    max-width: 100px; /* Adjust the max width as necessary */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 20px; /* Space between the image and the search bar */
+}

@@ -8,8 +8,9 @@ const { getUserData } = require('./routes/auth');
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
-const getUserCartFilePath = (username) => path.join(__dirname, 'data', `${username}'s Cart Details.txt`);
 const ordersFilePath = path.join(__dirname, 'data', 'orders.txt');
+const ratingsFilePath = path.join(__dirname, "data", "ratings.txt");
+const nodemailer = require('nodemailer');
 
 // Convert fs.readFile into Promise version of same    
 const readFile = util.promisify(fs.readFile);
@@ -94,12 +95,20 @@ async function getProducts() {
         const data = await readFile(productsFilePath, 'utf8');
         // Handle both Unix (\n) and Windows (\r\n) newlines
         const productBlocks = data.trim().split(/\r?\n\r?\n/);
-        const products = productBlocks.map(block => {
+        const products = await Promise.all(productBlocks.map(async (block) => {
             const lines = block.split(/\r?\n/);
             const [id, name, price, quantity] = lines[0].split('\t');
-            const description = lines.slice(1).join(' '); // Join the rest as description
-            return { id, name, price, quantity, description };
-        });
+            const description = lines.slice(1).join(' ');
+
+            // Calculate the average rating for the product
+            const ratingsData = await readFile(ratingsFilePath, 'utf8');
+            const ratings = ratingsData.trim().split('\n');
+            const productRatings = ratings.filter(rating => rating.split('\t')[1] === id);
+            const totalRating = productRatings.reduce((sum, rating) => sum + parseInt(rating.split('\t')[2], 10), 0);
+            const averageRating = productRatings.length > 0 ? totalRating / productRatings.length : 0;
+
+            return { id, name, price, quantity, description, averageRating };
+        }));
         return products;
     } catch (error) {
         console.error("Error reading the products file:", error);
@@ -107,46 +116,46 @@ async function getProducts() {
     }
 }
 
-async function addItemToCart(username, item) {
-    const filePath = getUserCartFilePath(username);
-    try {
-        let fileContent = "";
-        let cartItems = [];
-        const userCartExists = fs.existsSync(filePath);
-
-        if (userCartExists) {
-            fileContent = await fs.promises.readFile(filePath, 'utf8');
-            const lines = fileContent.trim().split('\n').slice(1); // Skip the first line containing the username
-            cartItems = lines.map(line => {
-                const [id, title, price, quantity] = line.split('\t');
-                return { id, title, price, quantity: parseInt(quantity, 10) };
-            });
-        } else {
-            // If the cart doesn't exist, start with the username
-            fileContent = `${username}\n`;
-        }
-
-        // Check if the item already exists in the cart
-        const existingItemIndex = cartItems.findIndex(cartItem => cartItem.id === item.id);
-        if (existingItemIndex !== -1) {
-            // If the item exists, increase the quantity
-            cartItems[existingItemIndex].quantity += item.quantity;
-        } else {
-            // If the item doesn't exist, add it to the cart
-            cartItems.push(item);
-        }
-
-        // Reconstruct the file content
-        const updatedContent = cartItems.map(cartItem => `${cartItem.id}\t${cartItem.title}\t${cartItem.price}\t${cartItem.quantity}`).join('\n');
-        await fs.promises.writeFile(filePath, `${username}\n${updatedContent}`, 'utf8');
-        return { success: true, message: "Item added to cart successfully." };
-    } catch (error) {
-        console.error("Error updating the cart:", error);
-        return { success: false, message: "Error updating the cart." };
-    }
+function getUserCartFilePath(username) {
+    return path.join(__dirname, 'data', `${username}'s Cart Details.txt`);
 }
 
-async function createNewOrder(username, address, city, country) {
+async function addItemToCart(username, item) {
+    const filePath = getUserCartFilePath(username);
+
+    // Initialize cartItems array
+    let cartItems = [];
+
+    // Check if the cart file exists
+    if (fs.existsSync(filePath)) {
+        // If the file exists, read its content
+        const fileContent = await fs.promises.readFile(filePath, 'utf8');
+        const lines = fileContent.trim().split('\n').slice(1); // Skip the first line containing the username
+        cartItems = lines.map(line => {
+            const [id, title, price, quantity] = line.split('\t');
+            return { id, title, price, quantity: parseInt(quantity, 10) };
+        });
+    }
+
+    // Proceed with adding or updating the item in the cartItems array
+    const existingItemIndex = cartItems.findIndex(cartItem => cartItem.id === item.id);
+    if (existingItemIndex !== -1) {
+        // If the item exists, update its quantity
+        cartItems[existingItemIndex].quantity += item.quantity;
+    } else {
+        // If the item doesn't exist, add it to the cart
+        cartItems.push(item);
+    }
+
+    // Reconstruct the file content with the updated cartItems array
+    const updatedContent = cartItems.map(cartItem => `${cartItem.id}\t${cartItem.title}\t${cartItem.price}\t${cartItem.quantity}`).join('\n');
+    // Write the updated content to the file, creating it if it doesn't exist
+    await fs.promises.writeFile(filePath, `${username}\n${updatedContent}`, 'utf8');
+
+    return { success: true, message: "Item added to cart successfully." };
+}
+
+async function createNewOrder(username, fullAddress) {
     try {
     // Read the user's cart
     const cartFilePath = getUserCartFilePath(username);
@@ -177,7 +186,27 @@ async function createNewOrder(username, address, city, country) {
     const today = new Date();
     const formattedDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
 
-    const newOrder = `${newOrderId}\t${username}\t${formattedDate}\t${totalPrice}\tPending\t${address}, ${city}, ${country}\n${productsWithQuantities.join('\t')}\n`;
+    const newOrder = `${newOrderId}\t${username}\t${formattedDate}\t${totalPrice}\tPending\t${fullAddress}\n${productsWithQuantities.join('\t')}\n`;
+
+    const productsData = await readFile(productsFilePath, 'utf8');
+    const productBlocks = productsData.trim().split(/\r?\n\r?\n/);
+    const updatedProductBlocks = productBlocks.map(block => {
+        const lines = block.split(/\r?\n/);
+        const [id, name, price, quantity] = lines[0].split('\t');
+        const description = lines.slice(1).join(' ');
+
+        // Check if the product is in the order
+        const orderedProduct = productsWithQuantities.find(product => product.startsWith(id));
+        if (orderedProduct) {
+            const [, orderedQuantity] = orderedProduct.split('(');
+            const newQuantity = parseInt(quantity, 10) - parseInt(orderedQuantity, 10);
+            return `${id}\t${name}\t${price}\t${newQuantity}\n${description}`;
+        }
+
+        return block;
+    });
+
+    await writeFile(productsFilePath, updatedProductBlocks.join('\n\n'), 'utf8');
 
     // Append the new order to orders.txt
     await appendFile(ordersFilePath, `\n${newOrder}`);
@@ -185,14 +214,124 @@ async function createNewOrder(username, address, city, country) {
     // Clear the user's cart
     await writeFile(cartFilePath, `${username}\n`);
 
-    return { success: true, message: "Order created successfully." };
+    return { success: true, message: "Order created successfully.", orderID: newOrderId, orderDate: formattedDate, totalPrice };
+
     } catch (error) {
     console.error("Error creating new order:", error);
     return { success: false, message: "Error creating new order." };
     }
 }
 
+async function sendOrderStatusEmail(username, orderID, orderDate, totalPrice, address, status) {
+    try {
+        const usersData = await readFile(path.join(__dirname, 'data', 'users.txt'), 'utf8');
+        const users = usersData.trim().split('\n');
+        const user = users.find(user => user.split('\t')[0] === username);
+        if (!user) {
+            console.error(`User ${username} not found.`);
+            return;
+        }
+        const [, , email] = user.split('\t');
+
+        let subject = '';
+        let emailBody = '';
+
+        switch (status) {
+            case 'Pending':
+                subject = 'Order Confirmation';
+                emailBody = `
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <h2 style="color: #007bff;">UAE Traditional Mart</h2>
+                    <p>Dear ${username},</p>
+        
+                    <p>Thank you for your order!</p>
+        
+                    <p><strong>Order ID:</strong> ${orderID}<br>
+                    <strong>Order Date:</strong> ${orderDate}<br>
+                    <strong>Total Price:</strong> ${totalPrice} AED<br>
+                    <strong>Shipping Address:</strong> ${address}</p>
+        
+                    <p>We will process your order and ship it as soon as possible.<br>
+                    Happy shopping!</p>
+        
+                    <hr>
+                    <p>Best regards,<br>UAE Traditional Mart</p>
+                </div>
+                `;
+                break;
+            case 'Shipped':
+                subject = 'Order Shipped';
+                emailBody = `
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <h2 style="color: #007bff;">UAE Traditional Mart</h2>
+                    <p>Dear ${username},</p>
+        
+                    <p>Your order has been shipped!</p>
+        
+                    <p><strong>Order ID:</strong> ${orderID}<br>
+                    <strong>Order Date:</strong> ${orderDate}<br>
+                    <strong>Total Price:</strong> ${totalPrice} AED<br>
+                    <strong>Shipping Address:</strong> ${address}</p>
+        
+                    <p>You can expect delivery soon. Thank you for shopping with us.</p>
+        
+                    <hr>
+                    <p>Best regards,<br>UAE Traditional Mart</p>
+                </div>
+                `;
+                break;
+            case 'Delivered':
+                subject = 'Order Delivered';
+                emailBody = `
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <h2 style="color: #007bff;">UAE Traditional Mart</h2>
+                    <p>Dear ${username},</p>
+        
+                    <p>Your order has been delivered!</p>
+        
+                    <p><strong>Order ID:</strong> ${orderID}<br>
+                    <strong>Order Date:</strong> ${orderDate}<br>
+                    <strong>Total Price:</strong> ${totalPrice} AED<br>
+                    <strong>Shipping Address:</strong> ${address}</p>
+        
+                    <p>We hope you enjoy your purchase. Thank you for shopping with us.</p>
+        
+                    <hr>
+                    <p>Best regards,<br>UAE Traditional Mart</p>
+                </div>
+                `;
+                break;
+            default:
+                // Handle other statuses or default case
+                return; // Exit if the status is not recognized
+        }
+
+        // Setup mailOptions within the switch/case structure
+        const mailOptions = {
+            from: 'uaetraditionalmart@gmail.com',
+            to: email,
+            subject: subject,
+            html: emailBody,
+        };
+
+        // Send the email outside the switch/case structure
+        await transporter.sendMail(mailOptions);
+        console.log(`Order status (${status}) email sent to ${email}`);
+    } catch (error) {
+        console.error('Error sending order status email:', error);
+    }
+}
+
 const app = express();
+
+// Create a Nodemailer transporter
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'uaetraditionalmart@gmail.com',
+        pass: 'zrso hmuf dkcq tcab',
+    },
+});
 
 // Use cors middleware to enable CORS
 app.use(cors());
@@ -200,7 +339,7 @@ app.use(cors());
 // Use bodyParser middleware to parse JSON bodies
 app.use(bodyParser.json());
 
-// Login endpoint
+// USER/ADMIN LOGIN
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const result = authenticateUser(username, password);
@@ -211,27 +350,108 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.post('/signup', (req, res) => {
-    const { username, password, email, phoneNumber, firstName, lastName } = req.body;
-    const newUserLine = `${username}\t${password}\t${email}\t${phoneNumber}\t${firstName}\t${lastName}\n`;
-
-    const filePath = path.join(__dirname, 'data', 'users.txt'); // Adjust the path to your users.txt file
-
-    fs.appendFile(filePath, newUserLine, (err) => {
-        if (err) {
-        console.error('Failed to append new user to file:', err);
-        return res.status(500).send('Error signing up the user.');
+// USER FORGOT PASSWORD
+app.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    try {
+        const usersData = await readFile(path.join(__dirname, 'data', 'users.txt'), 'utf8');
+        const users = usersData.trim().split('\n');
+        const user = users.find(user => user.split('\t')[2] === email);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found." });
         }
-        res.status(200).send('User signed up successfully.');
-    });
+        const mailOptions = {
+            from: 'uaetraditionalmart@gmail.com',
+            to: email,
+            subject: 'Password Reset Request',
+            html: `
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <h2 style="color: #007bff;">UAE Traditional Mart</h2>
+                    <p>You requested a password reset for your account.</p>
+                    <p>Please click the button below to set a new password:</p>
+                    <a href="http://localhost:3001/reset-password/${encodeURIComponent(email)}" style="background-color: #007bff; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a>
+                    <p>If you did not request a password reset, please ignore this email or contact support if you have concerns.</p>
+                    <hr>
+                    <p>Thank you,<br>UAE Traditional Mart IT Team <br>050 123 4567</p>
+                </div>
+            `,
+        };
+        await transporter.sendMail(mailOptions);
+        res.json({ success: true, message: "Password reset link sent." });
+    } catch (error) {
+        console.error("Error sending password reset email:", error);
+        res.status(500).json({ success: false, message: "Error sending password reset email." });
+    }
 });
 
+// USER RESET PASSWORD
+app.post('/reset-password/:email', async (req, res) => {
+    const { email } = req.params;
+    const { newPassword } = req.body;
+    try {
+        let usersData = await readFile(path.join(__dirname, 'data', 'users.txt'), 'utf8');
+        let users = usersData.trim().split('\n');
+        let found = false;
+        let updatedUsers = users.map(user => {
+            const parts = user.split('\t');
+            if (parts[2] === decodeURIComponent(email)) {
+                parts[1] = newPassword; // Update the password
+                found = true;
+            }
+            return parts.join('\t');
+        });
+        if (!found) {
+            return res.status(404).json({ success: false, message: "User not found." });
+        }
+        await writeFile(path.join(__dirname, 'data', 'users.txt'), updatedUsers.join('\n') + '\n', 'utf8'); // Add newline at the end
+        res.json({ success: true, message: "Password reset successful." });
+    } catch (error) {
+        console.error("Error resetting password:", error);
+        res.status(500).json({ success: false, message: "Error resetting password." });
+    }
+});
+
+// USER SIGNUP
+app.post('/signup', async (req, res) => {
+    const { username, password, email, phoneNumber, firstName, lastName } = req.body;
+
+    const filePath = path.join(__dirname, 'data', 'users.txt');
+
+    try {
+        const data = await fs.promises.readFile(filePath, 'utf8');
+        const users = data.trim().split('\n');
+
+        // Check if the username or email already exists
+        const userExists = users.some(user => {
+            const [fileUsername, , fileEmail] = user.split('\t');
+            return fileUsername === username || fileEmail === email;
+        });
+
+        console.log('User exists:', userExists);
+        if (userExists) {
+            console.log('Returning username/email exists message');
+            return res.status(400).json({ success: false, message: 'Username or email already exists.' });
+        }
+
+        // If the username or email doesn't exist, proceed to append the new user
+        const newUserLine = `${username}\t${password}\t${email}\t${phoneNumber}\t${firstName}\t${lastName}\n`;
+        await fs.promises.appendFile(filePath, newUserLine);
+        console.log('User signed up successfully');
+        res.status(200).json({ success: true, message: 'User signed up successfully.' });
+    } catch (err) {
+        console.error('Failed to read or append new user to file:', err);
+        res.status(500).json({ success: false, message: 'Error signing up the user.' });
+    }
+});
+
+// USER AUTHENTICATION
 app.get('/isAuthenticated', (req, res) => {
     // This is a simplified example. You should secure this endpoint.
     const isAuthenticated = checkAuthentication(); // Implement this function based on your .txt file logic
     res.json({ isAuthenticated });
 });
 
+// USER GET PROFILE USERNAME
 app.get('/profile/:username', (req, res) => {
     const { username } = req.params;
     const userData = getUserData(username);
@@ -243,12 +463,14 @@ app.get('/profile/:username', (req, res) => {
     }
 });
 
+// USER UPDATE PROFILE
 app.post('/updateProfile', async (req, res) => {
     const { originalUsername, ...updates } = req.body;
     const result = await updateUserProfile(originalUsername, updates);
     res.json(result);
 });
 
+// USER DELETE ACCOUNT
 app.delete('/deleteAccount', async (req, res) => {
     const { username } = req.body; // Assuming the username is sent in the request body
 
@@ -269,6 +491,7 @@ app.delete('/deleteAccount', async (req, res) => {
     }
 });
 
+// ADMIN GET USERS
 app.get('/users', (req, res) => {
     const filePath = path.join(__dirname, 'data', 'users.txt');
     fs.readFile(filePath, 'utf8', (err, data) => {
@@ -286,6 +509,7 @@ app.get('/users', (req, res) => {
     });
 });
 
+// ADMIN DELETE USER
 app.delete('/deleteUser', async (req, res) => {
     const { username } = req.body; // The username of the user to delete
 
@@ -302,7 +526,7 @@ app.delete('/deleteUser', async (req, res) => {
     }
 });
 
-// Endpoint to get products
+// USER/ADMIN GET PRODUCTS
 app.get('/products', async (req, res) => {
     try {
         const products = await getProducts();
@@ -312,15 +536,42 @@ app.get('/products', async (req, res) => {
     }
 });
 
+// USER/ADMIN GET PRODUCTS
+app.get('/product/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const data = await readFile(productsFilePath, 'utf8');
+        const products = data.trim().split(/\r?\n\r?\n/); // Split by double newline to get each product block
+        const product = products.find(p => p.startsWith(id + '\t')); // Find the product by ID
+        if (product) {
+            const lines = product.split(/\r?\n/);
+            const [productId, name, price, quantity] = lines[0].split('\t');
+            const description = lines.slice(1).join(' '); // Join the rest as description
+            res.json({ id: productId, name, price, quantity: parseInt(quantity, 10), description });
+        } else {
+            res.status(404).json({ message: "Product not found" });
+        }
+    } catch (error) {
+        console.error("Error reading the products file:", error);
+        res.status(500).json({ message: "Error fetching product details" });
+    }
+});
+
+// USER ADD PRODUCT (to cart)
 app.post('/addToCart', async (req, res) => {
     const { username, item } = req.body;
     const result = await addItemToCart(username, item);
     res.json(result);
 });
 
+// USER GET CART
 app.get('/cart/:username', async (req, res) => {
     const { username } = req.params;
     const filePath = getUserCartFilePath(username);
+
+    if (!fs.existsSync(filePath)) {
+        return res.json([]);
+    }
     try {
         const cartContents = await fs.promises.readFile(filePath, 'utf8');
         const items = cartContents.trim().split('\n').slice(1).map(line => {
@@ -334,20 +585,21 @@ app.get('/cart/:username', async (req, res) => {
     }
 });
 
-// Endpoint to increment item quantity in the cart
+// USER INCREMENT ITEM
 app.post('/cart/increment', async (req, res) => {
     const { username, itemId } = req.body;
     const result = await updateCartItemQuantity(username, itemId, 1); // Increment by 1
     res.json(result);
 });
 
-// Endpoint to decrement item quantity in the cart
+// USER DECREMENT ITEM
 app.post('/cart/decrement', async (req, res) => {
     const { username, itemId } = req.body;
     const result = await updateCartItemQuantity(username, itemId, -1); // Decrement by 1
     res.json(result);
 });
 
+// USER CART DELETE (after order is successful)
 app.post('/cart/delete', async (req, res) => {
     const { username, itemId } = req.body;
     const filePath = getUserCartFilePath(username); // Assuming this function returns the path to the user's cart file
@@ -368,7 +620,7 @@ app.post('/cart/delete', async (req, res) => {
     }
 });
 
-// Add this endpoint to server.js
+// USER GET ORDERS
 app.get('/orders/:username', async (req, res) => {
     const { username } = req.params;
     const ordersFilePath = path.join(__dirname, 'data', 'orders.txt');
@@ -416,10 +668,12 @@ app.get('/orders/:username', async (req, res) => {
     }
 });
 
+// ADMIN ANALYTICS PAGE
 app.get('/analytics', async (req, res) => {
     try {
         const ordersData = await readFile(path.join(__dirname, 'data', 'orders.txt'), 'utf8');
         const productsData = await readFile(path.join(__dirname, 'data', 'products.txt'), 'utf8');
+        const ratingsData = await readFile(path.join(__dirname, 'data', 'ratings.txt'), 'utf8');
 
         // Splitting the data into lines and then processing
         const ordersLines = ordersData.trim().split('\n\n');
@@ -553,6 +807,30 @@ app.get('/analytics', async (req, res) => {
         analytics.aov = roundTo(aov, 2);
         analytics.salesByCategory = salesByCategory;
 
+        // Calculate average ratings
+        const ratingsLines = ratingsData.trim().split('\n');
+        const ratings = ratingsLines.reduce((acc, line) => {
+            const [username, productId, productName, rating] = line.split('\t');
+            if (!acc[productId]) {
+                acc[productId] = { productName, totalRating: 0, count: 0 };
+            }
+            acc[productId].totalRating += parseInt(rating, 10);
+            acc[productId].count += 1;
+            return acc;
+        }, {});
+
+        const averageRatings = Object.entries(ratings).map(([productId, { productName, totalRating, count }]) => ({
+            productId,
+            productName,
+            averageRating: roundTo(totalRating / count, 2),
+        }));
+
+        let bestRatedProduct = averageRatings.reduce((best, product) => product.averageRating > best.averageRating ? product : best, { productId: null, productName: null, averageRating: 0 });
+        let worstRatedProduct = averageRatings.reduce((worst, product) => product.averageRating < worst.averageRating ? product : worst, { productId: null, productName: null, averageRating: Infinity });
+
+        analytics.bestRatedProduct = bestRatedProduct;
+        analytics.worstRatedProduct = worstRatedProduct;
+
         res.json({ success: true, analytics });
     } catch (error) {
         console.error("Error generating analytics:", error);
@@ -601,11 +879,18 @@ app.post('/updateOrderStatus', async (req, res) => {
         let ordersData = await fs.promises.readFile(path.join(__dirname, 'data', 'orders.txt'), 'utf8');
         let orders = ordersData.trim().split('\n\n');
         let updated = false;
+        let currentStatus = ""; // Variable to hold the current status before update
+        let username, orderDate, totalPrice, address;
 
         const updatedOrders = orders.map(orderBlock => {
             const lines = orderBlock.split('\n');
             const orderDetails = lines[0].split('\t');
             if (orderDetails[0] === orderID) {
+                currentStatus = orderDetails[4]; // Capture the current status
+                username = orderDetails[1];
+                orderDate = orderDetails[2];
+                totalPrice = orderDetails[3];
+                address = orderDetails.slice(5).join(' '); // Assuming address is stored from the 6th element onwards
                 orderDetails[4] = newStatus; // Update the status
                 updated = true;
                 return `${orderDetails.join('\t')}\n${lines[1]}`;
@@ -615,6 +900,10 @@ app.post('/updateOrderStatus', async (req, res) => {
 
         if (updated) {
             await fs.promises.writeFile(path.join(__dirname, 'data', 'orders.txt'), updatedOrders.join('\n\n'), 'utf8');
+            // Check if the status has been updated to "Shipped" or "Delivered" and currentStatus is not the same as newStatus
+            if ((newStatus === "Shipped" || newStatus === "Delivered") && currentStatus !== newStatus) {
+                await sendOrderStatusEmail(username, orderID, orderDate, totalPrice, address, newStatus);
+            }
             res.json({ success: true, message: "Order status updated successfully." });
         } else {
             res.status(404).json({ success: false, message: "Order not found." });
@@ -641,10 +930,13 @@ app.delete('/deleteProduct', async (req, res) => {
     }
 });
 
-// Endpoint to add a product and upload an image
+// ADMIN UPLOAD IMAGE
 app.post('/addProduct', upload.single('image'), async (req, res) => {
-    if (!req.file || req.file.mimetype !== 'image/jpeg') {
-        return res.status(400).json({ success: false, message: "Only JPEG images are accepted." });
+    if (!req.file) {
+        return res.status(400).json({ success: false, message: "Image upload failed." });
+    }
+    if (!req.body.product) {
+        return res.status(400).json({ success: false, message: "Product data is missing." });
     }
 
     const product = JSON.parse(req.body.product);
@@ -692,6 +984,7 @@ app.post('/addProduct', upload.single('image'), async (req, res) => {
     });
 });
 
+// ADMIN EDIT PRODUCT
 app.post('/editProduct', async (req, res) => {
     const { id, name, price, quantity, description } = req.body;
     try {
@@ -712,16 +1005,22 @@ app.post('/editProduct', async (req, res) => {
     }
 });
 
+// USER CREATE ORDER
 app.post('/createOrder', async (req, res) => {
     const { username, address, city, country } = req.body;
+    
+    // Combine address, city, and country into a single string
+    const fullAddress = `${address}, ${city}, ${country}`;
+    
     try {
-        const result = await createNewOrder(username, address, city, country);
+        const result = await createNewOrder(username, fullAddress);
         if (result.success) {
             // Define the path to the user's cart file
             const cartFilePath = path.join(__dirname, 'data', `${username}'s Cart Details.txt`);
 
             try {
                 await fs.promises.unlink(cartFilePath);
+                await sendOrderStatusEmail(username, result.orderID, result.orderDate, result.totalPrice, fullAddress, "Pending");
                 console.log(`${username}'s cart file deleted successfully.`);
             } catch (err) {
                 console.error(`Failed to delete ${username}'s cart file:`, err);
@@ -740,9 +1039,28 @@ app.post('/createOrder', async (req, res) => {
     }
 });
 
+// USER SUBMIT RATING
+app.post("/submitRating", async (req, res) => {
+    const { username, productId, rating } = req.body;
+    try {
+        const newRating = `${username}\t${productId}\t${productName}\t${rating}\n`;
+        await fs.promises.appendFile(ratingsFilePath, newRating);
+        res.json({ success: true, message: "Rating submitted successfully." });
+    } catch (error) {
+        console.error("Error submitting rating:", error);
+        res.status(500).json({ success: false, message: "Error submitting rating." });
+    }
+});
+
 // Function to update item quantity in the cart
 async function updateCartItemQuantity(username, itemId, change) {
     const filePath = getUserCartFilePath(username);
+    // Check if the cart file exists before attempting to update
+    if (!fs.existsSync(filePath)) {
+        // If the file doesn't exist, there are no items to update
+        return { success: false, message: "Cart file does not exist, implying the cart is empty or the user does not exist." };
+    }
+
     try {
         let fileContent = await fs.promises.readFile(filePath, 'utf8');
         let lines = fileContent.trim().split('\n');

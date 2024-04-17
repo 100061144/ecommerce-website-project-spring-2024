@@ -8,7 +8,6 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  // Login.js
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -48,8 +47,9 @@ const Login = () => {
         <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required className="login-input" />
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required className="login-input" />
         <button type="submit" className="login-button">Login</button>
+        <button onClick={() => navigate('/signup')} className="login-button">Sign Up</button>
+        <Link to="/forgot-password" className="forgot-password-link">Forgot Password?</Link>
       </form>
-      <button onClick={() => navigate('/signup')} className="login-button">Sign Up</button>
     </div>
   );
 };

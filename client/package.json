@@ -12,6 +12,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "proxy": "http://localhost:3000",
   "dependencies": {
     "firebase": "^10.10.0",
     "react": "^18.2.0",

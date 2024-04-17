@@ -1,0 +1,30 @@
+100060009	101-032	Brown Sandal	5
+100060637	101-012	Red/White Ghutra	4
+100061144	101-022	Black Agal with Tail	4
+john.doe13	102-001	Black Abaya	5
+mohammed232	101-022	Black Agal with Tail	4
+sarah_lee93	103-001	(Kids) White Kandoora	5
+alex.jones	101-032	Brown Sandal	4
+mike_smith	102-003	Light Brown Abaya	5
+jane.doe	101-022	Black Agal with Tail	4
+chris.black	103-012	(Kids) Black-White Abaya	5
+lisa.white	101-012	Red/White Ghutra	4
+mark.brown	103-003	(Kids) Yellow Kandoora	5
+emily.green	101-022	Black Agal with Tail	4
+david.gray	102-012	Dark Maroon Sheila	4
+sophia.young	101-032	Brown Sandal	4
+liam.miller	103-001	(Kids) White Kandoora	5
+olivia.hall	101-012	Red/White Ghutra	4
+noah.allen	102-001	Black Abaya	5
+mia.turner	103-012	(Kids) Black-White Abaya	4
+jacob.ward	101-022	Black Agal with Tail	5
+ava.carter	102-003	Light Brown Abaya	4
+ethan.lee	101-032	Brown Sandal	5
+isabella.wilson	103-003	(Kids) Yellow Kandoora	4
+test2	102-012	Dark Maroon Sheila	3
+100060009	101-012	Red/White Ghutra	4
+100060637	103-001	(Kids) White Kandoora	5
+john.doe13	101-022	Black Agal with Tail	4
+mohammed232	102-001	Black Abaya	5
+sarah_lee93	101-032	Brown Sandal	4
+alex.jones	103-012	(Kids) Black-White Abaya	5

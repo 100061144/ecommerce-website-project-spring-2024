@@ -7,8 +7,11 @@ const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [cartItems, setCartItems] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
+
+    const [rating, setRating] = useState(0);
 
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
@@ -51,18 +54,119 @@ const ProductList = () => {
         navigate(`?search=${encodeURIComponent(query)}`);
     };
 
+    const handleRatingChange = (newRating) => {
+        setRating(newRating);
+    };
+
+    const submitRating = async (productId) => {
+        const username = localStorage.getItem("username");
+        if (!username) {
+            alert("Please log in to submit a rating.");
+            return;
+        }
+
+        if (rating === 0) {
+            alert("Please select a rating before submitting.");
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:3000/submitRating", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ username, productId, rating }),
+            });
+
+            if (response.ok) {
+                alert("Rating submitted successfully!");
+                setRating(0);
+
+                // Fetch the updated product data
+
+                const updatedProductsResponse = await fetch('http://localhost:3000/products');
+                const updatedProductsData = await updatedProductsResponse.json();
+                const updatedProducts = Array.isArray(updatedProductsData) ? updatedProductsData : updatedProductsData.products || [];
+
+                setProducts(updatedProducts);
+                setFilteredProducts(updatedProducts);
+
+                if (selectedProduct && selectedProduct.id === productId) {
+                    const updatedSelectedProduct = updatedProducts.find(product => product.id === productId);
+                    setSelectedProduct(updatedSelectedProduct);
+                }
+            } else {
+                alert("Failed to submit rating. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error submitting rating:", error);
+            alert("An error occurred while submitting the rating.");
+        }
+    };
+
+    useEffect(() => {
+        fetchCartItems();
+    }, []);
+
+    const fetchCartItems = async () => {
+        const username = localStorage.getItem("username");
+        if (username) {
+            try {
+                const response = await fetch(`http://localhost:3000/cart/${username}`);
+                const data = await response.json();
+                setCartItems(data);
+            } catch (error) {
+                console.error("Error fetching cart items:", error);
+            }
+        }
+    };
+
     const addItemToCart = async (product) => {
         const username = localStorage.getItem("username");
-        const response = await fetch('http://localhost:3000/addToCart', {
+        const response = await fetch(`http://localhost:3000/cart/${username}`);
+    
+        if (!response.ok) {
+            alert('Failed to fetch cart items');
+            return;
+        }
+    
+        const cartItems = await response.json();
+    
+        // Validate that cartItems is an array
+        if (!Array.isArray(cartItems)) {
+            console.error('Expected cartItems to be an array', cartItems);
+            alert('Error processing cart items');
+            return;
+        }
+    
+        const existingItem = cartItems.find(item => item.id === product.id);
+        const quantityInCart = existingItem ? existingItem.quantity : 0;
+    
+        if (quantityInCart + 1 > product.quantity) {
+            alert('Product is already in cart, check your cart for details.');
+            fetchCartItems(); // Fetch the updated cart items after the alert
+            navigate('/cart');
+            return;
+        }
+    
+        const addToCartResponse = await fetch('http://localhost:3000/addToCart', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, item: product }),
+            body: JSON.stringify({ username, item: { ...product, maxQuantity: product.quantity } }),
         });
-        const data = await response.json();
+    
+        if (!addToCartResponse.ok) {
+            alert('Failed to add item to cart');
+            return;
+        }
+    
+        const data = await addToCartResponse.json();
         if (data.success) {
             alert('Item added to cart successfully');
+            fetchCartItems(); // Fetch the updated cart items after successful addition
         } else {
             alert('Failed to add item to cart');
         }
@@ -91,15 +195,43 @@ const ProductList = () => {
                         <img src={`/images/${selectedProduct.id}.jpg`} alt={selectedProduct.name} className="product-image-large" />
                         <div className="product-info">
                             <h2>{selectedProduct.name} - {selectedProduct.price} AED</h2>
+                            {selectedProduct.quantity == 0 && (
+                                <p className="out-of-stock-message">OUT OF STOCK</p>
+                            )}
                             <p>{selectedProduct.description}</p>
+                            <div className="rating-container">
+                                <span>Rate this product:</span>
+                                <div className="rating-stars">
+                                    {[...Array(5)].map((_, index) => (
+                                        <span
+                                            key={index}
+                                            className={`star ${rating >= index + 1 ? "filled" : ""}`}
+                                            onClick={() => handleRatingChange(index + 1)}
+                                        >
+                                            &#9733;
+                                        </span>
+                                    ))}
+                                </div>
+                                <button onClick={() => submitRating(selectedProduct.id)}>
+                                    Submit Rating
+                                </button>
+                                <div className="average-rating">
+                                    Average Rating: {selectedProduct.averageRating.toFixed(1)}
+                                </div>
+                            </div>
                             <button 
-                                className="add-to-cart-button" 
-                                onClick={() => addItemToCart({
-                                    id: selectedProduct.id,
-                                    title: selectedProduct.name,
-                                    price: selectedProduct.price,
-                                    quantity: 1
-                                })}
+                                className={`add-to-cart-button ${selectedProduct.quantity == 0 ? 'disabled' : ''}`}
+                                disabled={selectedProduct.quantity === 0} // This line disables the button functionally and visually
+                                onClick={() => {
+                                    if (selectedProduct.quantity > 0) {
+                                        addItemToCart({
+                                            id: selectedProduct.id,
+                                            title: selectedProduct.name,
+                                            price: selectedProduct.price,
+                                            quantity: 1
+                                        });
+                                    }
+                                }}
                             >
                                 Add to Cart
                             </button>
@@ -136,8 +268,14 @@ const ProductList = () => {
                         {filteredProducts.map((product, index) => (
                             <div key={index} className="product-item">
                                 <img src={`/images/${product.id}.jpg`} alt={product.name} className="product-image" />
+                                {product.quantity == 0 && (
+                                    <p className="out-of-stock-message">OUT OF STOCK</p>
+                                )}
                                 <h2 className="product-title">{product.name} - {product.price} AED</h2>
                                 <p>{product.description}</p>
+                                <div className="average-rating">
+                                    Average Rating: {product.averageRating.toFixed(1)}
+                                </div>
                                 <button 
                                     className="view-details-button" 
                                     onClick={() => setSelectedProduct(product)}
@@ -145,13 +283,18 @@ const ProductList = () => {
                                     View Details
                                 </button>
                                 <button 
-                                    className="add-to-cart-button" 
-                                    onClick={() => addItemToCart({
-                                        id: product.id,
-                                        title: product.name,
-                                        price: product.price,
-                                        quantity: 1
-                                    })}
+                                    className={`add-to-cart-button ${product.quantity == 0 ? 'disabled' : ''}`}
+                                    disabled={product.quantity === 0}
+                                    onClick={() => {
+                                        if (product.quantity > 0) {
+                                            addItemToCart({
+                                                id: product.id,
+                                                title: product.name,
+                                                price: product.price,
+                                                quantity: 1
+                                            });
+                                        }
+                                    }}
                                 >
                                     Add to Cart
                                 </button>

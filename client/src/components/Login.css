@@ -40,8 +40,25 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin: 5px;
 }
 
 .login-button:hover {
     background-color: #0056b3;
+}
+
+.forgot-password-link {
+    display: block; /* Change to block to allow centering */
+    width: fit-content; /* Adjust width to fit the content */
+    margin: 10px auto; /* Top and bottom margin with auto left and right margin for centering */
+    padding: 10px 15px;
+    background-color: #ffc107; /* Change background color to yellow */
+    color: #333; /* Change text color for better contrast, adjust as needed */
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.forgot-password-link:hover {
+    background-color: #e0a800; /* Darker shade of yellow for hover effect */
 }

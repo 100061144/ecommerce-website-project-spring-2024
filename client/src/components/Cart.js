@@ -51,8 +51,29 @@ const Cart = () => {
         }
     };
 
-    const incrementQuantity = (itemId) => {
-        updateQuantity(itemId, 'increment');
+    const incrementQuantity = async (itemId) => {
+        const item = cartItems.find((item) => item.id === itemId);
+        if (!item) {
+            alert('Item not found in cart.');
+            return;
+        }
+
+        // Fetch product details to get maxQuantity
+        try {
+            const productResponse = await fetch(`http://localhost:3000/product/${itemId}`);
+            const productData = await productResponse.json();
+            const maxQuantity = productData.quantity; // Assuming the product data has a 'quantity' field for maxQuantity
+
+            if (item.quantity < maxQuantity) {
+                updateQuantity(itemId, 'increment');
+            } else {
+                alert('You have reached the maximum available quantity for this item.');
+            }
+        } catch (error) {
+            console.error("Error fetching product details:", error);
+            alert('Failed to fetch product details.');
+        }
+
     };
 
     const decrementQuantity = (itemId) => {
@@ -104,7 +125,12 @@ const Cart = () => {
                             <div className="quantity-controls">
                                 <button onClick={() => decrementQuantity(item.id)}>-</button>
                                 <span>{item.quantity}</span>
-                                <button onClick={() => incrementQuantity(item.id)}>+</button>
+                                <button
+                                    onClick={() => incrementQuantity(item.id)}
+                                    disabled={item.quantity >= item.maxQuantity}
+                                >
+                                    +
+                                </button>
                             </div>
                             <button className="delete-button" onClick={() => confirmDelete(item.id)}>Delete</button> {/* Add this line */}
                         </div>

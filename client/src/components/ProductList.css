@@ -122,27 +122,51 @@
     margin: auto; /* Center the image if it's not filling the entire width of its container */
 }
 
-/* Ensure the SearchBar component's CSS (SearchBar.css) centers the input field if not already */
-.similar-products-container {
-    margin-top: 20px;
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the content */
+    width: 100%; /* Ensure it spans the full width of its parent */
 }
 
-.similar-products {
-    display: flex;
-    overflow-x: auto;
-    gap: 20px;
+.similar-products-container {
+    margin-top: 20px;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow-y: hidden; /* Prevent vertical scrolling */
+    white-space: nowrap;
+    padding: 20px 0;
+    width: 90%; /* Adjust based on your layout, ensures it doesn't overflow */
+    max-width: 1200px; /* Maximum width can be adjusted */
+    box-sizing: border-box; /* Includes padding and border in the element's total width */
 }
 
 .similar-product-item {
-    flex: 0 0 auto; /* Prevent flex items from growing or shrinking */
-    width: 200px; /* Adjust based on your design */
-    cursor: pointer;
+    display: inline-block;
+    width: 175px; /* Adjust width as needed */
+    margin-right: 20px;
+    vertical-align: top;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
 }
 
-.similar-product-image {
+.similar-product-item img {
     width: 100%;
     height: auto;
 }
+
+.similar-product-item div {
+    padding: 10px;
+    overflow: visible; /* Change to visible to allow text to wrap */
+    text-overflow: clip; /* Change to clip since we're now wrapping text */
+    white-space: normal; /* Allow the text to wrap to the next line */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 60px; /* Adjust height as needed to fit both lines */
+  }
 
 .cart-button {
     /* Styling for the "Cart" button */
@@ -160,4 +184,58 @@
 
 .cart-button:hover {
     background-color: #0056b3; /* Darker blue on hover */
+}
+
+.rating-container {
+    margin-top: 20px;
+}
+
+.rating-stars {
+    display: inline-block;
+    font-size: 24px;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.rating-stars .star {
+    display: inline-block;
+    transition: color 0.2s;
+}
+
+.rating-stars .star.filled {
+    color: #f8ce0b;
+}
+.rating-container button {
+    margin-left: 10px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.rating-container button:hover {
+    background-color: #0056b3;
+}
+
+.average-rating {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.out-of-stock-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.add-to-cart-button.disabled {
+    background-color: #ccc !important;
+    color: #666 !important;
+    cursor: not-allowed !important;
 }

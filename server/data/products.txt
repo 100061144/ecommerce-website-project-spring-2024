@@ -1,13 +1,13 @@
-101-001	White Kandoora	200	10
+101-001	White Kandoora	200	0
 A white arabic-style kandoora.
 
-101-002	Navy Blue Kandoora	200	10
+101-002	Navy Blue Kandoora	200	1
 A navy-blue qatari-style kandoora.
 
-101-003	Black Kandoora	200	10
+101-003	Black Kandoora	200	9
 A black kuwaiti-style kandoora.
 
-101-011	White Ghutra	50	10
+101-011	White Ghutra	50	9
 A plain ghutra for men.
 
 101-012	Red/White Ghutra	50	10
