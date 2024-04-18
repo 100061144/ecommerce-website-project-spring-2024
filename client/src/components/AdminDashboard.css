@@ -489,6 +489,7 @@
 
 .analytics-container {
   max-width: 1200px;
+  min-width: 600px;
   margin: 20px auto;
   padding: 20px;
   background-color: #fff;
@@ -532,4 +533,23 @@
 .analytics-container p span, .analytics-container ul li span {
   font-weight: bold;
   color: #007bff;
+}
+
+.analytics-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.analytics-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.analytics-button:hover {
+  background-color: #0056b3;
 }

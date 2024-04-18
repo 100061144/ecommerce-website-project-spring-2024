@@ -18,6 +18,8 @@ const AdminDashboard = () => {
   const [file, setFile] = useState(null); // State to hold the uploaded file
   const [preview, setPreview] = useState(''); // State to hold the preview URL
   const [analytics, setAnalytics] = useState(null);
+  const [analyticsType, setAnalyticsType] = useState(''); // State to manage the type of analytics displayed
+
 
   const fetchAnalytics = async () => {
     try {
@@ -130,9 +132,6 @@ const AdminDashboard = () => {
       alert('Failed to update order status');
     }
   };
-
-  // Assuming this state exists and is updated by the file input's onChange handler
-// const [file, setFile] = useState(null);
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
@@ -291,6 +290,7 @@ const AdminDashboard = () => {
   const handleDisplaySection = (section) => {
     setDisplaySection(section);
     setSelectedUser(null); // Reset selected user when changing sections
+    setAnalyticsType('');
   };
 
   // Filtered lists based on search query
@@ -393,104 +393,136 @@ const AdminDashboard = () => {
         </>
       )}
       {displaySection === 'analytics' && analytics && (
-    <div className="analytics-container">
-        <h2>Analytics</h2>
-        <p><strong>Most Ordered Product:</strong> {analytics.mostOrderedProduct.name} (Orders: {analytics.mostOrderedProduct.orderCount})</p>
-        <p><strong>Least Ordered Product:</strong> {analytics.leastOrderedProduct.name} (Orders: {analytics.leastOrderedProduct.orderCount})</p>
-        <p><strong>Product with Most Quantity Ordered:</strong> {analytics.mostQuantityOrderedProduct.name} (Quantity: {analytics.mostQuantityOrderedProduct.totalOrdered})</p>
-        <p><strong>Product with Least Quantity Ordered:</strong> {analytics.leastQuantityOrderedProduct.name} (Quantity: {analytics.leastQuantityOrderedProduct.totalOrdered})</p>
-        <p><strong>Order with the Highest Total Price:</strong> {analytics.highestTotalPriceOrder.orderID} (Total Price: {analytics.highestTotalPriceOrder.totalPrice} AED)</p>
-        <p><strong>Order with the Lowest Total Price:</strong> {analytics.lowestTotalPriceOrder.orderID} (Total Price: {analytics.lowestTotalPriceOrder.totalPrice} AED)</p>
-        <p><strong>Average Order Value (AOV):</strong> {analytics.aov} AED</p>
-        <h3>Sales by Product Category:</h3>
-        <ul>
-            {Object.entries(analytics.salesByCategory).map(([category, data]) => (
-                <li key={category}><strong>Category {category}:</strong> {data.totalQuantity} items sold, Total Sales: {data.totalSales} AED</li>
-            ))}
-        </ul>
-        <h2>Rating Analytics</h2>
-        {analytics.bestRatedProduct && (
-            <p>
-                <strong>Best Rated Product:</strong> {analytics.bestRatedProduct.productName} ({analytics.bestRatedProduct.productId}) - Average Rating: {analytics.bestRatedProduct.averageRating}
-            </p>
-        )}
-        {analytics.worstRatedProduct && (
-            <p>
-                <strong>Worst Rated Product:</strong> {analytics.worstRatedProduct.productName} ({analytics.worstRatedProduct.productId}) - Average Rating: {analytics.worstRatedProduct.averageRating})
-            </p>
-        )}
-    </div>
-)}
-      {displaySection === 'products' && (
-  <>
-    {!showAddProductForm && !selectedProduct ? (
-      <>
-        <div className="search-bar-centering-container">
-          <SearchBar onSearch={handleSearch} placeholder="Search for products..." />
-          <button onClick={() => setShowAddProductForm(true)} className="add-product-button">Add Product</button>
-        </div>
-        <div className="products-list">
-          {filteredProducts.map((product, index) => (
-            <div key={index} className="product-item">
-              <img src={`/images/${product.id}.jpg`} alt={product.name} style={{ width: '100%', height: 'auto' }} />
-              <p>{product.name}</p>
-              <p>Price: {product.price} AED</p>
-              <button onClick={() => handleSelectProduct(product)} className="details-button">View Details</button>
-              <button onClick={() => handleDeleteProduct(product.id)} className="delete-user-button">Delete</button>
+        <div className="analytics-container">
+            <h2>Analytics</h2>
+            <div className="analytics-buttons">
+                <button onClick={() => setAnalyticsType('basic')} className="analytics-button">Basic Analytics</button>
+                <button onClick={() => setAnalyticsType('category')} className="analytics-button">Category Analytics</button>
+                <button onClick={() => setAnalyticsType('ratings')} className="analytics-button">Rating Analytics</button>
             </div>
-          ))}
+            {analyticsType === 'basic' && (
+                <>
+                    <h2>Basic Analytics</h2>
+                    <p><strong>Most Ordered Product:</strong> {analytics.mostOrderedProduct.name} (Orders: {analytics.mostOrderedProduct.orderCount})</p>
+                    <p><strong>Least Ordered Product:</strong> {analytics.leastOrderedProduct.name} (Orders: {analytics.leastOrderedProduct.orderCount})</p>
+                    <p><strong>Product with Most Quantity Ordered:</strong> {analytics.mostQuantityOrderedProduct.name} (Quantity: {analytics.mostQuantityOrderedProduct.totalOrdered})</p>
+                    <p><strong>Product with Least Quantity Ordered:</strong> {analytics.leastQuantityOrderedProduct.name} (Quantity: {analytics.leastQuantityOrderedProduct.totalOrdered})</p>
+                    <p><strong>Order with the Highest Total Price:</strong> {analytics.highestTotalPriceOrder.orderID} (Total Price: {analytics.highestTotalPriceOrder.totalPrice} AED)</p>
+                    <p><strong>Order with the Lowest Total Price:</strong> {analytics.lowestTotalPriceOrder.orderID} (Total Price: {analytics.lowestTotalPriceOrder.totalPrice} AED)</p>
+                    <p><strong>Average Order Value (AOV):</strong> {analytics.aov} AED</p>
+                </>
+            )}
+            {analyticsType === 'category' && (
+                <>
+                    <h2>Sales by Product Category:</h2>
+                    <ul>
+                        {Object.entries(analytics.salesByCategory).map(([category, data]) => {
+                            // Define the category names based on category IDs
+                            const categoryNames = {
+                                '101': 'Men',
+                                '102': 'Women',
+                                '103': 'Kids'
+                            };
+
+                            // Get the category name from the mapping, default to 'Unknown' if not found
+                            const categoryName = categoryNames[category] || 'Unknown';
+
+                            return (
+                                <li key={category}>
+                                    <strong>Category {category} ({categoryName}):</strong> {data.totalQuantity} items sold, Total Sales: {data.totalSales} AED
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </>
+            )}
+            {analyticsType === 'ratings' && (
+                <>
+                    <h2>Rating Analytics</h2>
+                    {analytics.bestRatedProduct && (
+                        <p>
+                            <strong>Best Rated Product:</strong> {analytics.bestRatedProduct.productName} ({analytics.bestRatedProduct.productId}) - Average Rating: {analytics.bestRatedProduct.averageRating}
+                        </p>
+                    )}
+                    {analytics.worstRatedProduct && (
+                        <p>
+                            <strong>Worst Rated Product:</strong> {analytics.worstRatedProduct.productName} ({analytics.worstRatedProduct.productId}) - Average Rating: {analytics.worstRatedProduct.averageRating})
+                        </p>
+                    )}
+                </>
+            )}
         </div>
-      </>
-    ) : showAddProductForm ? (
-      <form onSubmit={handleAddProduct} className="add-product-form">
-        <input type="text" name="id" placeholder="ID" required />
-        <input type="text" name="name" placeholder="Name" required />
-        <input type="number" name="price" placeholder="Price" required />
-        <input type="number" name="quantity" placeholder="Quantity" required />
-        <textarea name="description" placeholder="Description" required></textarea>
-        <div {...getRootProps({ 
-            className: `dropzone ${isDragAccept ? 'dropzone--is-drag-accept' : ''} ${isDragReject ? 'dropzone--is-drag-reject' : ''}`
-          })}>
-          <input {...getInputProps()} />
-          <p>Drag 'n' drop some files here, or click to select files</p>
-          {preview && (
-          <div className="image-preview-container">
-            <img src={preview} alt="Preview" style={{ width: '100px', height: '100px' }} />
-            <button onClick={removeImage} className="remove-image-button">X</button>
-          </div>
-        )}
-        </div>
-        <button type="submit" className="save-changes-button">Submit</button>
-        <button type="button" onClick={() => setShowAddProductForm(false)} className="back-button">Back to Products</button>
-      </form>
-    ) : selectedProduct && (
-      <div className="product-details">
-        <img src={`/images/${selectedProduct.id}.jpg`} alt={selectedProduct.name} className="product-detail-image" />
-        <div className="product-details-text">
-          <h2>{selectedProduct.name}</h2>
-          <p>ID: {selectedProduct.id}</p>
-          <p>Price: {selectedProduct.price}</p>
-          <p>Quantity: {selectedProduct.quantity}</p>
-          <p>Description: {selectedProduct.description}</p>
-          <button onClick={() => setSelectedProduct(null)} className="back-button">Back to Products</button>
-          {!isEditing && (
-            <button onClick={() => setIsEditing(true)} className="edit-product-button">Edit</button>
+      )}
+      {displaySection === 'products' && (
+        <>
+          {!showAddProductForm && !selectedProduct ? (
+            <>
+              <div className="search-bar-centering-container">
+                <SearchBar onSearch={handleSearch} placeholder="Search for products..." />
+                <button onClick={() => setShowAddProductForm(true)} className="add-product-button">Add Product</button>
+              </div>
+              <div className="products-list">
+                {filteredProducts.map((product, index) => (
+                  <div key={index} className="product-item">
+                    <img src={`/images/${product.id}.jpg`} alt={product.name} style={{ width: '100%', height: 'auto' }} />
+                    <p>{product.name}</p>
+                    <p>Price: {product.price} AED</p>
+                    <button onClick={() => handleSelectProduct(product)} className="details-button">View Details</button>
+                    <button onClick={() => handleDeleteProduct(product.id)} className="delete-user-button">Delete</button>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : showAddProductForm ? (
+            <form onSubmit={handleAddProduct} className="add-product-form">
+              <input type="text" name="id" placeholder="ID" required />
+              <input type="text" name="name" placeholder="Name" required />
+              <input type="number" name="price" placeholder="Price" required />
+              <input type="number" name="quantity" placeholder="Quantity" required />
+              <textarea name="description" placeholder="Description" required></textarea>
+              <div {...getRootProps({ 
+                  className: `dropzone ${isDragAccept ? 'dropzone--is-drag-accept' : ''} ${isDragReject ? 'dropzone--is-drag-reject' : ''}`
+                })}>
+                <input {...getInputProps()} />
+                <p>Drag 'n' drop some files here, or click to select files</p>
+                {preview && (
+                <div className="image-preview-container">
+                  <img src={preview} alt="Preview" style={{ width: '100px', height: '100px' }} />
+                  <button onClick={removeImage} className="remove-image-button">X</button>
+                </div>
+              )}
+              </div>
+              <button type="submit" className="save-changes-button">Submit</button>
+              <button type="button" onClick={() => setShowAddProductForm(false)} className="back-button">Back to Products</button>
+            </form>
+          ) : selectedProduct && (
+            <div className="product-details">
+              <img src={`/images/${selectedProduct.id}.jpg`} alt={selectedProduct.name} className="product-detail-image" />
+              <div className="product-details-text">
+                <h2>{selectedProduct.name}</h2>
+                <p>ID: {selectedProduct.id}</p>
+                <p>Price: {selectedProduct.price}</p>
+                <p>Quantity: {selectedProduct.quantity}</p>
+                <p>Description: {selectedProduct.description}</p>
+                <button onClick={() => setSelectedProduct(null)} className="back-button">Back to Products</button>
+                {!isEditing && (
+                  <button onClick={() => setIsEditing(true)} className="edit-product-button">Edit</button>
+                )}
+                {isEditing && (
+                  <form onSubmit={handleEditProduct}>
+                    <input type="text" name="name" defaultValue={selectedProduct.name} />
+                    <input type="number" name="price" defaultValue={selectedProduct.price} />
+                    <input type="number" name="quantity" defaultValue={selectedProduct.quantity} />
+                    <textarea name="description" defaultValue={selectedProduct.description}></textarea>
+                    <button type="submit" className="save-changes-button">Save Changes</button>
+                    <button type="button" onClick={() => setIsEditing(false)} className="cancel-button">Cancel</button>
+                </form>
+                )}
+              </div>
+            </div>
           )}
-          {isEditing && (
-            <form onSubmit={handleEditProduct}>
-              <input type="text" name="name" defaultValue={selectedProduct.name} />
-              <input type="number" name="price" defaultValue={selectedProduct.price} />
-              <input type="number" name="quantity" defaultValue={selectedProduct.quantity} />
-              <textarea name="description" defaultValue={selectedProduct.description}></textarea>
-              <button type="submit" className="save-changes-button">Save Changes</button>
-              <button type="button" onClick={() => setIsEditing(false)} className="cancel-button">Cancel</button>
-          </form>
-          )}
-        </div>
-      </div>
-    )}
-  </>
-)}
+        </>
+      )}
     </div>
   );
 };

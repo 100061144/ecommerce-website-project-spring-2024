@@ -51,19 +51,13 @@ const Profile = () => {
     const data = await response.json();
     if (data.success) {
       // Update localStorage with new user info if the server confirms success
-      // Assuming the server response includes all updated fields
       localStorage.setItem('username', username); // Username is already being updated correctly
 
       // Ensure these fields are updated based on the server's response
-      // The following lines assume your server response includes these fields
-      // If the server doesn't return the updated values, you'll need to adjust it accordingly
       localStorage.setItem('email', email);
       localStorage.setItem('phoneNumber', phoneNumber);
       localStorage.setItem('firstName', firstName);
       localStorage.setItem('lastName', lastName);
-
-      // Note: Updating password in localStorage is generally not recommended for security reasons
-      // Consider handling authentication and session management without storing passwords in localStorage
 
       alert('Profile updated successfully');
       setEditMode(false);

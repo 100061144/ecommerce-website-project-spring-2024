@@ -8,7 +8,7 @@ import './Home.css';
 const Home = () => {
   const navigateOnSearch = "/products"; // go to products page
   const [recommendedProducts, setRecommendedProducts] = useState([]);
-  const username = localStorage.getItem("username"); // Assuming username is stored in localStorage
+  const username = localStorage.getItem("username"); // Getting stored username in localStorage
 
   useEffect(() => {
     const fetchRecommendedProducts = async () => {

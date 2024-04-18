@@ -21,7 +21,7 @@ const Cart = () => {
     
                 // Calculate the total cost
                 const totalCost = data.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-                setTotalCost(totalCost); // Assuming you have a state variable for totalCost
+                setTotalCost(totalCost); // Setting totalCost
             } catch (error) {
                 console.error("Error fetching cart items:", error);
             }
@@ -62,7 +62,7 @@ const Cart = () => {
         try {
             const productResponse = await fetch(`http://localhost:3000/product/${itemId}`);
             const productData = await productResponse.json();
-            const maxQuantity = productData.quantity; // Assuming the product data has a 'quantity' field for maxQuantity
+            const maxQuantity = productData.quantity; // Getting quantity field for maxQuantity
 
             if (item.quantity < maxQuantity) {
                 updateQuantity(itemId, 'increment');
@@ -88,7 +88,6 @@ const Cart = () => {
     
     const deleteCartItem = async (itemId) => {
         const username = localStorage.getItem("username");
-        // Assuming your server has an endpoint to handle item deletion from the cart
         const response = await fetch(`http://localhost:3000/cart/delete`, {
             method: 'POST',
             headers: {
@@ -115,6 +114,7 @@ const Cart = () => {
 
     return (
         <div className="cart-container">
+            <img src={`/images/UAE_Traditional_Mart.png`} alt="Banner" className="home-banner" />
             <h1>Your Cart</h1>
             <div className="cart-items">
                 {cartItems.length > 0 ? (

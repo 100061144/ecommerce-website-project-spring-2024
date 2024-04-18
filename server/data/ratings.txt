@@ -28,3 +28,15 @@ john.doe13	101-022	Black Agal with Tail	4
 mohammed232	102-001	Black Abaya	5
 sarah_lee93	101-032	Brown Sandal	4
 alex.jones	103-012	(Kids) Black-White Abaya	5
+100061144	101-001	White Kandoora	5
+sarah_lee93	101-001	White Kandoora	3
+jane.doe	101-001	White Kandoora	4
+100060637	101-001	White Kandoora	5
+john.doe13	101-002	Navy Blue Kandoora	4
+100060637	101-002	Navy Blue Kandoora	5
+chris.black	101-002	Navy Blue Kandoora	4
+100061144	101-002	Navy Blue Kandoora	2
+mark.brown	101-003	Black Kandoora	5
+ava.carter	101-003	Black Kandoora	4
+liam.miller	101-003	Black Kandoora	4
+alex.jones	101-003	Black Kandoora	4

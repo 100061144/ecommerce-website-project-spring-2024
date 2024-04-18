@@ -50,6 +50,7 @@ const Login = () => {
 
   return (
     <div className="login-container">
+      <img src={`/images/UAE_Traditional_Mart.png`} alt="Banner" className="home-banner" />
       <h1>Login</h1>
       <form onSubmit={handleSubmit} className="login-form">
         <input

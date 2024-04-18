@@ -56,6 +56,7 @@ const Signup = () => {
 
   return (
     <div className="signup-container">
+      <img src={`/images/UAE_Traditional_Mart.png`} alt="Banner" className="home-banner" />
       <h2>Sign Up</h2>
       <form onSubmit={handleSubmit}>
         {/* Form fields for user details */}

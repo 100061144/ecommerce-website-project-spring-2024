@@ -25,7 +25,7 @@ const Payment = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const username = localStorage.getItem("username"); // Assuming username is stored in localStorage
+    const username = localStorage.getItem("username"); // Getting stored username in localStorage
     if (!username) {
       alert('You must be logged in to make a payment.');
       return;
@@ -38,12 +38,10 @@ const Payment = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username, // Assuming you have the username stored or retrieved from somewhere
-          // Include the shipping details in the request
+          username,
           address: paymentDetails.address,
           city: paymentDetails.city,
           country: paymentDetails.country,
-          // Include other necessary details as required
         }),
       });
 

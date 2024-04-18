@@ -34,6 +34,7 @@ const ForgotPassword = () => {
 
     return (
         <div className="forgot-password-container">
+            <img src={`/images/UAE_Traditional_Mart.png`} alt="Banner" className="home-banner" />
             <h1>Forgot Password</h1>
             <form onSubmit={handleSubmit} className="forgot-password-form">
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className="forgot-password-input" />

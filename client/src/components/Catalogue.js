@@ -62,7 +62,8 @@ const Catalogue = () => {
 
   return (
     <div className="catalogue-container">
-      <Link to="/" className="home-button">Home</Link>
+      <Link to="/" className="catalogue-home-button">Home</Link>
+      <img src={`/images/UAE_Traditional_Mart.png`} alt="Banner" className="home-banner" />
       <h1>Catalogue</h1>
       <div className="catalogue-sections">
         {sectionsData.map((section) => (

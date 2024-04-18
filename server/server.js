@@ -333,6 +333,18 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+const getBasicAnalytics = () => {
+    return { data: "Basic analytics data" };
+};
+
+const getCategoryAnalytics = () => {
+    return { data: "Category analytics data" };
+};
+
+const getRatingsAnalytics = () => {
+    return { data: "Ratings analytics data" };
+};
+
 // Use cors middleware to enable CORS
 app.use(cors());
 
@@ -344,7 +356,7 @@ app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const result = authenticateUser(username, password);
     if (result.success) {
-        res.json(result); // Ensure this includes username, email, phoneNumber, firstName, lastName
+        res.json(result); // Returns username, email, phoneNumber, firstName, lastName
     } else {
         res.status(401).json({ success: false, message: "Invalid credentials" });
     }
@@ -472,7 +484,7 @@ app.post('/updateProfile', async (req, res) => {
 
 // USER DELETE ACCOUNT
 app.delete('/deleteAccount', async (req, res) => {
-    const { username } = req.body; // Assuming the username is sent in the request body
+    const { username } = req.body; // Username is sent in the request body
 
     const filePath = path.join(__dirname, 'data', 'users.txt');
     try {
@@ -602,7 +614,7 @@ app.post('/cart/decrement', async (req, res) => {
 // USER CART DELETE (after order is successful)
 app.post('/cart/delete', async (req, res) => {
     const { username, itemId } = req.body;
-    const filePath = getUserCartFilePath(username); // Assuming this function returns the path to the user's cart file
+    const filePath = getUserCartFilePath(username); // Returns the path to the user's cart file
 
     try {
         // Read the current contents of the cart file
@@ -680,7 +692,6 @@ app.get('/analytics', async (req, res) => {
         const productLines = productsData.trim().split('\n\n');
 
         // Creating a map of product IDs to product names and quantities
-        // Assuming this part is correct and included in the server.js
         const productMap = productLines.reduce((acc, block) => {
             const lines = block.split('\n');
             const [id, name, price, quantity] = lines[0].split('\t');
@@ -838,6 +849,18 @@ app.get('/analytics', async (req, res) => {
     }
 });
 
+app.get('/api/analytics/basic', (req, res) => {
+    res.json(getBasicAnalytics());
+});
+
+app.get('/api/analytics/category', (req, res) => {
+    res.json(getCategoryAnalytics());
+});
+
+app.get('/api/analytics/ratings', (req, res) => {
+    res.json(getRatingsAnalytics());
+});
+
 // ADMIN ORDER PAGE
 app.get('/orders', async (req, res) => {
     try {
@@ -846,7 +869,7 @@ app.get('/orders', async (req, res) => {
         const productMap = productsData.trim().split(/\r?\n\r?\n/).reduce((acc, productBlock) => {
             // Splitting lines in a block using both \r\n and \n for compatibility
             const lines = productBlock.split(/\r?\n/);
-            const [id, name] = lines[0].split('\t'); // Assuming the first line contains ID and name
+            const [id, name] = lines[0].split('\t'); // 1st line contains ID and name
             acc[id.trim()] = name.trim(); // Trim to remove any leading/trailing spaces
             return acc;
         }, {});
@@ -890,7 +913,7 @@ app.post('/updateOrderStatus', async (req, res) => {
                 username = orderDetails[1];
                 orderDate = orderDetails[2];
                 totalPrice = orderDetails[3];
-                address = orderDetails.slice(5).join(' '); // Assuming address is stored from the 6th element onwards
+                address = orderDetails.slice(5).join(' '); // Address is stored from the 6th element onwards
                 orderDetails[4] = newStatus; // Update the status
                 updated = true;
                 return `${orderDetails.join('\t')}\n${lines[1]}`;
@@ -1041,10 +1064,33 @@ app.post('/createOrder', async (req, res) => {
 
 // USER SUBMIT RATING
 app.post("/submitRating", async (req, res) => {
-    const { username, productId, productName, rating} = req.body;
+    const { username, productId, productName, rating } = req.body;
     try {
-        const newRating = `${username}\t${productId}\t${productName}\t${rating}\n`;
-        await fs.promises.appendFile(ratingsFilePath, newRating);
+        // Read the existing ratings
+        const existingRatings = await fs.promises.readFile(ratingsFilePath, 'utf8');
+        const ratings = existingRatings.trim().split('\n');
+
+        // Initialize a flag to check if the rating was updated
+        let updated = false;
+
+        // Map through ratings to update or keep existing
+        const updatedRatings = ratings.map(ratingLine => {
+            const [rateUsername, rateProductId, rateProductName, oldRating] = ratingLine.split('\t');
+            if (rateUsername === username && rateProductId === productId) {
+                updated = true; // Mark as updated
+                return `${username}\t${productId}\t${productName}\t${rating}`; // Update the rating
+            }
+            return ratingLine; // Return unchanged rating
+        });
+
+        // If the rating was not updated (i.e., no existing rating was found), append the new rating
+        if (!updated) {
+            updatedRatings.push(`${username}\t${productId}\t${productName}\t${rating}`);
+        }
+
+        // Write the updated or new ratings back to the file
+        await fs.promises.writeFile(ratingsFilePath, updatedRatings.join('\n') + '\n');
+
         res.json({ success: true, message: "Rating submitted successfully." });
     } catch (error) {
         console.error("Error submitting rating:", error);
