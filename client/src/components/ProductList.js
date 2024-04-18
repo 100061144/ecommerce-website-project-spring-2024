@@ -97,11 +97,11 @@ const ProductList = () => {
                     setSelectedProduct(updatedSelectedProduct);
                 }
             } else {
-                alert("Failed to submit rating. Please try again.");
+                alert("Failed to submit rating: " + response.message);
             }
         } catch (error) {
             console.error("Error submitting rating:", error);
-            alert("An error occurred while submitting the rating.");
+            alert("An error occurred while submitting the rating: " + error.message);
         }
     };
 
@@ -127,7 +127,7 @@ const ProductList = () => {
         const response = await fetch(`http://localhost:3000/cart/${username}`);
     
         if (!response.ok) {
-            alert('Failed to fetch cart items');
+            alert('Failed to fetch cart items: ' + response.message);
             return;
         }
     
@@ -168,7 +168,7 @@ const ProductList = () => {
             alert('Item added to cart successfully');
             fetchCartItems(); // Fetch the updated cart items after successful addition
         } else {
-            alert('Failed to add item to cart');
+            alert('Failed to add item to cart: ' + data.message);
         }
     };
 

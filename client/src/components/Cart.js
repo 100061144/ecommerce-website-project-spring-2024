@@ -71,7 +71,7 @@ const Cart = () => {
             }
         } catch (error) {
             console.error("Error fetching product details:", error);
-            alert('Failed to fetch product details.');
+            alert('Failed to fetch product details: ' + error.message);
         }
 
     };
@@ -100,7 +100,7 @@ const Cart = () => {
             alert('Item removed successfully');
             fetchCartItems(); // Refresh the cart items
         } else {
-            alert('Failed to remove item');
+            alert('Failed to remove item: ' + data.message);
         }
     };
 

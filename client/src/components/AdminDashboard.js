@@ -28,11 +28,11 @@ const AdminDashboard = () => {
       if (data.success) {
         setAnalytics(data.analytics);
       } else {
-        alert('Failed to fetch analytics');
+        alert('Failed to fetch analytics: ' + data.message);
       }
     } catch (error) {
       console.error("Error fetching analytics:", error);
-      alert('Failed to fetch analytics');
+      alert('Failed to fetch analytics: ' + error.message);
     }
   };
 
@@ -44,16 +44,33 @@ const AdminDashboard = () => {
     isDragAccept,
     isDragReject
   } = useDropzone({
-    accept: 'image/jpeg',
-    onDrop: (acceptedFiles, fileRejections) => {
-      if (fileRejections.length > 0) {
-        alert('Only JPEG images are accepted.');
-      } else if (acceptedFiles.length > 0) {
-        const file = acceptedFiles[0];
-        setFile(file);
-        setPreview(URL.createObjectURL(file));
+      accept: {
+          'image/jpeg': ['.jpeg', '.jpg'],
+          'image/png': ['.png'],
+          'image/gif': ['.gif'],
+          'image/bmp': ['.bmp'],
+          'image/tiff': ['.tiff', '.tif'],
+          'image/webp': ['.webp']
+      },
+      onDrop: (acceptedFiles, fileRejections) => {
+          console.log('Accepted files:', acceptedFiles.map(file => file.type));
+          console.log('Rejected files:', fileRejections.map(({ file }) => file.type));
+
+          // Additional check for file extension
+          const validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.tif', '.webp'];
+          const allFilesValid = acceptedFiles.every(file => {
+              const extension = file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif|bmp|tiff|tif|webp)$/);
+              return extension && validExtensions.includes(extension[0]);
+          });
+
+          if (fileRejections.length > 0 || !allFilesValid) {
+              alert('Only specific image files (JPEG, PNG, GIF, BMP, TIFF, WebP) are accepted.');
+          } else if (acceptedFiles.length > 0 && allFilesValid) {
+              const file = acceptedFiles[0];
+              setFile(file);
+              setPreview(URL.createObjectURL(file));
+          }
       }
-    }
   });
 
    // Function to remove the image preview
@@ -70,11 +87,11 @@ const AdminDashboard = () => {
       if (data.success) {
         setUsers(data.users);
       } else {
-        alert('Failed to fetch users');
+        alert('Failed to fetch users: ' + data.message);
       }
     } catch (error) {
       console.error("Error fetching users:", error);
-      alert('Failed to fetch users');
+      alert('Failed to fetch users: ' + error.message);
     }
   };
 
@@ -86,11 +103,11 @@ const AdminDashboard = () => {
       if (data.success) {
         setOrders(data.orders);
       } else {
-        alert('Failed to fetch orders');
+        alert('Failed to fetch orders: ' + data.message);
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
-      alert('Failed to fetch orders');
+      alert('Failed to fetch orders: ' + error.message);
     }
   };
 
@@ -102,11 +119,11 @@ const AdminDashboard = () => {
       if (data.success) {
         setProducts(data.products);
       } else {
-        alert('Failed to fetch products');
+        alert('Failed to fetch products: ' + data.message);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
-      alert('Failed to fetch products');
+      alert('Failed to fetch products: ' + error.message);
     }
   };
 
@@ -125,11 +142,11 @@ const AdminDashboard = () => {
         alert('Order status updated successfully');
         fetchOrders(); // Refresh orders list
       } else {
-        alert('Failed to update order status');
+        alert('Failed to update order status: ' + data.message);
       }
     } catch (error) {
       console.error("Error updating order status:", error);
-      alert('Failed to update order status');
+      alert('Failed to update order status: ' + error.message);
     }
   };
 
@@ -164,11 +181,11 @@ const AdminDashboard = () => {
         setShowAddProductForm(false); // Hide the form
         fetchProducts(); // Refresh the products list
       } else {
-        alert('Failed to add product');
+        alert('Failed to add product: ' + data.message);
       }
     } catch (error) {
       console.error("Error adding product:", error);
-      alert('Failed to add product');
+      alert('Failed to add product: ' + error.message);
     }
   };
 
@@ -206,11 +223,11 @@ const AdminDashboard = () => {
         setSelectedUser(null); // Optionally, reset selectedUser if the deleted user was being viewed
         alert('User deleted successfully');
       } else {
-        alert('Failed to delete user');
+        alert('Failed to delete user: ' + data.message);
       }
     } catch (error) {
       console.error("Error deleting user:", error);
-      alert('Failed to delete user');
+      alert('Failed to delete user: ' + error.message);
     }
   };
 
@@ -234,11 +251,11 @@ const AdminDashboard = () => {
         alert('Product deleted successfully');
         fetchProducts(); // Refresh the products list
       } else {
-        alert('Failed to delete product');
+        alert('Failed to delete product: ' + data.message);
       }
     } catch (error) {
       console.error("Error deleting product:", error);
-      alert('Failed to delete product');
+      alert('Failed to delete product: ' + error.message);
     }
   };
 
@@ -268,11 +285,11 @@ const AdminDashboard = () => {
         fetchProducts(); // Refresh the products list
         setIsEditing(false); // Close the edit form
       } else {
-        alert('Failed to update product');
+        alert('Failed to update product: ' + data.message);
       }
     } catch (error) {
       console.error("Error updating product:", error);
-      alert('Failed to update product');
+      alert('Failed to update product: ' + error.message);
     }
   };
 

@@ -24,7 +24,7 @@ const ForgotPassword = () => {
         }
         } catch (error) {
         console.error("An error occurred during forgot password:", error);
-        alert("An error occurred during forgot password.");
+        alert("An error occurred during forgot password: " + error.message);
         }
     };
 

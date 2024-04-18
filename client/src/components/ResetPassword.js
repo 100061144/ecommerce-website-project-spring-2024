@@ -31,7 +31,7 @@ const ResetPassword = () => {
         }
         } catch (error) {
         console.error("An error occurred during password reset:", error);
-        alert("An error occurred during password reset.");
+        alert("An error occurred during password reset: " + error.message);
         }
     };
 

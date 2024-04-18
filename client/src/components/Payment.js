@@ -50,11 +50,11 @@ const Payment = () => {
         alert('Payment Successful and Order Created!');
         navigate('/'); // Navigate to the homepage or another route upon success
       } else {
-        alert('Failed to process payment and create order.');
+        alert('Failed to process payment and create order: ' + data.message);
       }
     } catch (error) {
       console.error("Error processing payment:", error);
-      alert('An error occurred while processing your payment.');
+      alert('An error occurred while processing your payment: ' + error.message);
     }
   };
 

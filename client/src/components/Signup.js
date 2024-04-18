@@ -46,7 +46,7 @@ const Signup = () => {
     })
     .catch(error => {
       console.error('Signup error:', error);
-      alert('Error signing up.'); // Display a generic error message
+      alert('Error signing up: ' + error.message);
     });
   };
 

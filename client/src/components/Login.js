@@ -40,7 +40,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error("An error occurred during login:", error);
-      alert("An error occurred during login.");
+      alert("An error occurred during login: " + error.message);
     }
   };
 

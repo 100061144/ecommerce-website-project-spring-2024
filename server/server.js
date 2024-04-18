@@ -953,7 +953,7 @@ app.delete('/deleteProduct', async (req, res) => {
     }
 });
 
-// ADMIN UPLOAD IMAGE
+// ADMIN ADD PRODUCT
 app.post('/addProduct', upload.single('image'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ success: false, message: "Image upload failed." });
@@ -964,16 +964,6 @@ app.post('/addProduct', upload.single('image'), async (req, res) => {
 
     const product = JSON.parse(req.body.product);
     const { id, name, price, quantity, description } = product;
-    const image = req.file; // Access the uploaded file from req.file
-
-    // Rename and move the file to the public/images directory
-    const targetPath = path.join(__dirname, '../client/public/images', `${id}.jpg`);
-
-    fs.rename(image.path, targetPath, async (err) => {
-    if (err) {
-        console.error("Error saving the image:", err);
-        return res.status(500).json({ success: false, message: "Error saving the image." });
-    }
 
     // Read existing products
     const productsFilePath = path.join(__dirname, 'data', 'products.txt');
@@ -982,29 +972,43 @@ app.post('/addProduct', upload.single('image'), async (req, res) => {
         const productBlocks = data.trim().split(/\r?\n\r?\n/);
         const products = productBlocks.map(block => {
             const lines = block.split(/\r?\n/);
-            const [id, name, price, quantity] = lines[0].split('\t');
-            const description = lines.slice(1).join(' '); // Join the rest as description
-            return { id, name, price, quantity, description };
+            const [existingId, existingName, existingPrice, existingQuantity] = lines[0].split('\t');
+            const existingDescription = lines.slice(1).join(' '); // Join the rest as description
+            return { id: existingId, name: existingName, price: existingPrice, quantity: existingQuantity, description: existingDescription };
         });
 
-        // Add new product
-        products.push({ id, name, price, quantity, description });
+        // Check for duplicate product ID
+        if (products.some(product => product.id === id)) {
+            return res.status(400).json({ success: false, message: "Product ID already exists." });
+        }
 
-        // Sort products by ID
-        products.sort((a, b) => a.id.localeCompare(b.id));
+        // Rename and move the file to the public/images directory
+        const image = req.file; // Access the uploaded file from req.file
+        const targetPath = path.join(__dirname, '../client/public/images', `${id}.jpg`);
+        fs.rename(image.path, targetPath, async (err) => {
+            if (err) {
+                console.error("Error saving the image:", err);
+                return res.status(500).json({ success: false, message: "Error saving the image." });
+            }
 
-        // Format products for file writing
-        const formattedProducts = products.map(product => `${product.id}\t${product.name}\t${product.price}\t${product.quantity}\n${product.description}`).join('\n\n');
+            // Add new product
+            products.push({ id, name, price, quantity, description });
 
-        // Write sorted products back to the file
-        await fs.promises.writeFile(productsFilePath, formattedProducts + '\n');
+            // Sort products by ID
+            products.sort((a, b) => a.id.localeCompare(b.id));
 
-        res.json({ success: true, message: "Product added and sorted successfully." });
+            // Format products for file writing
+            const formattedProducts = products.map(product => `${product.id}\t${product.name}\t${product.price}\t${product.quantity}\n${product.description}`).join('\n\n');
+
+            // Write sorted products back to the file
+            await fs.promises.writeFile(productsFilePath, formattedProducts + '\n');
+
+            res.json({ success: true, message: "Product added and sorted successfully." });
+        });
     } catch (readError) {
         console.error("Error reading or writing the products file:", readError);
         res.status(500).json({ success: false, message: "Error processing products file." });
     }
-    });
 });
 
 // ADMIN EDIT PRODUCT
