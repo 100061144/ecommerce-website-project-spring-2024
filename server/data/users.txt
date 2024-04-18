@@ -1,8 +1,7 @@
 admin	admin123	admin@admin.com	0501234567	Admin	Admin
-100061144	61144	100061144@ku.ac.ae	0501234567	Saif	Alafeefi
-test	test	test@gmail.com	0501234567	test	test
+100060637	60637	100060637@ku.ac.ae	0501234567	Ali	Alhammadi
 100060009	60009	100060009@ku.ac.ae	0501234567	Mohammed	Alshorafa
-100060637	60637	100060637@ku.ac.ae	0501234567	Ali	Hassan
+100061144	61144	100061144@ku.ac.ae	0501234567	Saif	Alafeefi
 john.doe13	jdpassword	john.doe13@example.com	0501234568	John	Doe
 mohammed232	moepassword	mohammed232@example.com	0501234569	Mohammed	Almheiri
 sarah_lee93	slpassword	sarah_lee93@example.com	0501234570	Sarah	Lee

@@ -62,3 +62,18 @@
 .forgot-password-link:hover {
     background-color: #e0a800; /* Darker shade of yellow for hover effect */
 }
+
+.password-input-container {
+    position: relative;
+}
+
+.show-password-button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+}

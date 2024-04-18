@@ -322,6 +322,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
+      <img src={`/images/UAE_Traditional_Mart.png`} alt="Banner" className="home-banner" />
       <h1>Admin Dashboard</h1>
       <div className="admin-buttons">
         <button onClick={() => handleDisplaySection('products')} className="admin-button">Manage Products</button>

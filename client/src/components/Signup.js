@@ -12,6 +12,7 @@ const Signup = () => {
     firstName: '',
     lastName: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -49,13 +50,33 @@ const Signup = () => {
     });
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className="signup-container">
       <h2>Sign Up</h2>
       <form onSubmit={handleSubmit}>
         {/* Form fields for user details */}
         <input type="text" name="username" value={userDetails.username} onChange={handleChange} placeholder="Username" required />
-        <input type="password" name="password" value={userDetails.password} onChange={handleChange} placeholder="Password" required />
+        <div className="password-input-container">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            name="password"
+            value={userDetails.password}
+            onChange={handleChange}
+            placeholder="Password"
+            required
+          />
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="show-password-button"
+          >
+            {showPassword ? 'Hide' : 'Show'} Password
+          </button>
+        </div>
         <input type="email" name="email" value={userDetails.email} onChange={handleChange} placeholder="Email" required />
         <input type="text" name="phoneNumber" value={userDetails.phoneNumber} onChange={handleChange} placeholder="Phone Number" required />
         <input type="text" name="firstName" value={userDetails.firstName} onChange={handleChange} placeholder="First Name" required />

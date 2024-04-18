@@ -6,6 +6,7 @@ import './Login.css'; // Ensure this path matches your CSS file's location
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -25,6 +26,9 @@ const Login = () => {
         localStorage.setItem('firstName', data.firstName);
         localStorage.setItem('lastName', data.lastName);
 
+        // Show pop-up for successful login
+        alert('Login successful!');
+
         // Redirect based on isAdmin flag
         if (data.isAdmin) {
           navigate('/admin'); // Redirect to AdminDashboard for admin
@@ -40,15 +44,48 @@ const Login = () => {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className="login-container">
       <h1>Login</h1>
       <form onSubmit={handleSubmit} className="login-form">
-        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required className="login-input" />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required className="login-input" />
-        <button type="submit" className="login-button">Login</button>
-        <button onClick={() => navigate('/signup')} className="login-button">Sign Up</button>
-        <Link to="/forgot-password" className="forgot-password-link">Forgot Password?</Link>
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Username"
+          required
+          className="login-input"
+        />
+        <div className="password-input-container">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            required
+            className="login-input"
+          />
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="show-password-button"
+          >
+            {showPassword ? 'Hide' : 'Show'} Password
+          </button>
+        </div>
+        <button type="submit" className="login-button">
+          Login
+        </button>
+        <button onClick={() => navigate('/signup')} className="login-button">
+          Sign Up
+        </button>
+        <Link to="/forgot-password" className="forgot-password-link">
+          Forgot Password?
+        </Link>
       </form>
     </div>
   );

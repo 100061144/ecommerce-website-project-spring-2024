@@ -58,7 +58,7 @@ const ProductList = () => {
         setRating(newRating);
     };
 
-    const submitRating = async (productId) => {
+    const submitRating = async (productId, productName) => {
         const username = localStorage.getItem("username");
         if (!username) {
             alert("Please log in to submit a rating.");
@@ -76,7 +76,7 @@ const ProductList = () => {
                 headers: {
                 "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ username, productId, rating }),
+                body: JSON.stringify({ username, productId, productName, rating }),
             });
 
             if (response.ok) {
@@ -212,16 +212,16 @@ const ProductList = () => {
                                         </span>
                                     ))}
                                 </div>
-                                <button onClick={() => submitRating(selectedProduct.id)}>
+                                <button onClick={() => submitRating(selectedProduct.id, selectedProduct.name)}>
                                     Submit Rating
                                 </button>
                                 <div className="average-rating">
-                                    Average Rating: {selectedProduct.averageRating.toFixed(1)}
+                                Average Rating: {selectedProduct.averageRating ? selectedProduct.averageRating.toFixed(1) : 'N/A'}
                                 </div>
                             </div>
                             <button 
                                 className={`add-to-cart-button ${selectedProduct.quantity == 0 ? 'disabled' : ''}`}
-                                disabled={selectedProduct.quantity === 0} // This line disables the button functionally and visually
+                                disabled={selectedProduct.quantity == 0} // This line disables the button functionally and visually
                                 onClick={() => {
                                     if (selectedProduct.quantity > 0) {
                                         addItemToCart({
@@ -274,7 +274,7 @@ const ProductList = () => {
                                 <h2 className="product-title">{product.name} - {product.price} AED</h2>
                                 <p>{product.description}</p>
                                 <div className="average-rating">
-                                    Average Rating: {product.averageRating.toFixed(1)}
+                                    Average Rating: {product.averageRating ? product.averageRating.toFixed(1) : 'N/A'}
                                 </div>
                                 <button 
                                     className="view-details-button" 
@@ -284,7 +284,7 @@ const ProductList = () => {
                                 </button>
                                 <button 
                                     className={`add-to-cart-button ${product.quantity == 0 ? 'disabled' : ''}`}
-                                    disabled={product.quantity === 0}
+                                    disabled={product.quantity == 0}
                                     onClick={() => {
                                         if (product.quantity > 0) {
                                             addItemToCart({

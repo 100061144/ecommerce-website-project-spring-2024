@@ -6,6 +6,7 @@ import './ResetPasswordAndForgotPassword.css';
 const ResetPassword = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const { token } = useParams();
 
@@ -34,14 +35,43 @@ const ResetPassword = () => {
         }
     };
 
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     return (
         <div className="reset-password-container">
-        <h1>Reset Password</h1>
-        <form onSubmit={handleSubmit} className="reset-password-form">
-            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="New Password" required className="reset-password-input" />
-            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm Password" required className="reset-password-input" />
-            <button type="submit" className="reset-password-button">Reset Password</button>
-        </form>
+            <h1>Reset Password</h1>
+            <form onSubmit={handleSubmit} className="reset-password-form">
+                <div className="password-input-container">
+                <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="New Password"
+                    required
+                    className="reset-password-input"
+                />
+                <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="show-password-button"
+                >
+                    {showPassword ? 'Hide' : 'Show'} Password
+                </button>
+                </div>
+                <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm Password"
+                required
+                className="reset-password-input"
+                />
+                <button type="submit" className="reset-password-button">
+                    Reset Password
+                </button>
+            </form>
         </div>
     );
 };

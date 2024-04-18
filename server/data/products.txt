@@ -1,13 +1,13 @@
-101-001	White Kandoora	200	0
+101-001	White Kandoora	200	2
 A white arabic-style kandoora.
 
-101-002	Navy Blue Kandoora	200	1
+101-002	Navy Blue Kandoora	200	3
 A navy-blue qatari-style kandoora.
 
-101-003	Black Kandoora	200	9
+101-003	Black Kandoora	200	5
 A black kuwaiti-style kandoora.
 
-101-011	White Ghutra	50	9
+101-011	White Ghutra	50	8
 A plain ghutra for men.
 
 101-012	Red/White Ghutra	50	10
@@ -16,50 +16,50 @@ A classic ghutra for men.
 101-021	Black Agal	60	10
 A black agal headress for men.
 
-101-022	Black Agal with Tail	60	10
+101-022	Black Agal with Tail	60	9
 A tailed-black agal headress for men.
 
-101-031	White Sandal	350	10
+101-031	White Sandal	350	9
 A white sandal for men.
 
-101-032	Brown Sandal	350	10
+101-032	Brown Sandal	350	14
 A brown sandal for men.
 
-101-033	Black Sandal	350	10
+101-033	Black Sandal	350	3
 A black sandal for men.
 
-102-001	Black Abaya	220	10
+102-001	Black Abaya	220	9
 A black abaya for women.
 
-102-002	Dark Brown Abaya	220	10
+102-002	Dark Brown Abaya	220	3
 A dark brown abaya for women.
 
-102-003	Light Brown Abaya	220	10
+102-003	Light Brown Abaya	220	4
 A light brown abaya for women.
 
-102-011	White Sheila	120	10
+102-011	White Sheila	120	9
 A white sheila for women.
 
-102-012	Dark Maroon Sheila	120	10
+102-012	Dark Maroon Sheila	120	6
 A dark maroon sheila for women.
 
-102-013	Dark Mustard Sheila	120	10
+102-013	Dark Mustard Sheila	120	8
 A dark mustard sheila for women.
 
-103-001	(Kids) White Kandoora	170	10
+103-001	(Kids) White Kandoora	170	4
 A white kids kandoora.
 
-103-002	(Kids) Navy Blue Kandoora	170	10
+103-002	(Kids) Navy Blue Kandoora	170	3
 A navy blue kandoora.
 
-103-003	(Kids) Yellow Kandoora	170	10
+103-003	(Kids) Yellow Kandoora	170	6
 A yellow kids kandoora.
 
-103-011	(Kids) Patterned Abaya	170	10
+103-011	(Kids) Patterned Abaya	170	7
 A black and white patterned kids abaya.
 
-103-012	(Kids) Black-White Abaya	170	10
+103-012	(Kids) Black-White Abaya	170	6
 A black and white kids abaya.
 
-103-013	(Kids) Black Abaya	170	10
+103-013	(Kids) Black Abaya	170	7
 A black kids abaya with a knitted scarf.

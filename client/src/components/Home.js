@@ -47,9 +47,8 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      <img src={`${process.env.PUBLIC_URL}/images/KU Logo.png`} alt="Banner" className="home-banner" />
+      <img src={`/images/UAE_Traditional_Mart.png`} alt="Banner" className="home-banner" />
       <SearchBar navigateOnSearch={navigateOnSearch} placeholder="Search for products..." />
-      <h1>Welcome to UAE Traditional Mart!</h1>
       <div className="home-buttons">
         <Link to="/catalogue" className="home-button">Catalogue</Link>
         <Link to="/orders" className="home-button">Orders</Link>

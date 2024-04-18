@@ -104,7 +104,7 @@ async function getProducts() {
             const ratingsData = await readFile(ratingsFilePath, 'utf8');
             const ratings = ratingsData.trim().split('\n');
             const productRatings = ratings.filter(rating => rating.split('\t')[1] === id);
-            const totalRating = productRatings.reduce((sum, rating) => sum + parseInt(rating.split('\t')[2], 10), 0);
+            const totalRating = productRatings.reduce((sum, rating) => sum + parseInt(rating.split('\t')[3], 10), 0);
             const averageRating = productRatings.length > 0 ? totalRating / productRatings.length : 0;
 
             return { id, name, price, quantity, description, averageRating };
@@ -536,7 +536,7 @@ app.get('/products', async (req, res) => {
     }
 });
 
-// USER/ADMIN GET PRODUCTS
+// USER/ADMIN GET PRODUCTS DETAILS
 app.get('/product/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -671,9 +671,9 @@ app.get('/orders/:username', async (req, res) => {
 // ADMIN ANALYTICS PAGE
 app.get('/analytics', async (req, res) => {
     try {
-        const ordersData = await readFile(path.join(__dirname, 'data', 'orders.txt'), 'utf8');
-        const productsData = await readFile(path.join(__dirname, 'data', 'products.txt'), 'utf8');
-        const ratingsData = await readFile(path.join(__dirname, 'data', 'ratings.txt'), 'utf8');
+        const ordersData = await readFile(ordersFilePath, 'utf8');
+        const productsData = await readFile(productsFilePath, 'utf8');
+        const ratingsData = await readFile(ratingsFilePath, 'utf8');
 
         // Splitting the data into lines and then processing
         const ordersLines = ordersData.trim().split('\n\n');
@@ -691,21 +691,21 @@ app.get('/analytics', async (req, res) => {
         // Counting orders and quantities for each product
         const productCounts = {};
         ordersLines.forEach(order => {
-        const productIDs = order.split('\n')[1].split('\t');
-        productIDs.forEach(id => {
-            const [productId, quantity] = id.split('(');
-            const parsedQuantity = parseInt(quantity, 10);
-            if (productMap[productId]) {
-                if (!productCounts[productId]) {
-                    productCounts[productId] = {
-                    orderCount: 0,
-                    totalOrdered: 0,
-                    };
+            const productIDs = order.split('\n')[1].split('\t');
+            productIDs.forEach(id => {
+                const [productId, quantity] = id.split('(');
+                const parsedQuantity = parseInt(quantity, 10);
+                if (productMap[productId]) {
+                    if (!productCounts[productId]) {
+                        productCounts[productId] = {
+                        orderCount: 0,
+                        totalOrdered: 0,
+                        };
+                    }
+                    productCounts[productId].orderCount += 1;
+                    productCounts[productId].totalOrdered += parsedQuantity;
                 }
-                productCounts[productId].orderCount += 1;
-                productCounts[productId].totalOrdered += parsedQuantity;
-            }
-        });
+            });
         });
 
         // Preparing analytics data
@@ -1041,7 +1041,7 @@ app.post('/createOrder', async (req, res) => {
 
 // USER SUBMIT RATING
 app.post("/submitRating", async (req, res) => {
-    const { username, productId, rating } = req.body;
+    const { username, productId, productName, rating} = req.body;
     try {
         const newRating = `${username}\t${productId}\t${productName}\t${rating}\n`;
         await fs.promises.appendFile(ratingsFilePath, newRating);

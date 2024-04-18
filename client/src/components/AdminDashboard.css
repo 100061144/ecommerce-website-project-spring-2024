@@ -133,6 +133,8 @@
   padding: 20px 40px; /* Increase horizontal padding */
   margin: 0 auto; /* Center the grid in the middle of the page */
   max-width: 1200px; /* Adjust maximum width as needed */
+  max-height: 600px; /* Set a maximum height for the container */
+  overflow-y: auto; /* Enable vertical scrolling */
 }
 
 .product-item {
