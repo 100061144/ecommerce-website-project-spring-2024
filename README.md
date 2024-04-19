@@ -43,7 +43,7 @@ cd client npm install cd ../server npm install
    ```
     npm start
    ```
-   (or nodemon this if you have nodemon installed)
+   (or ```nodemon this``` if you have nodemon installed)
    
    - In the `client` directory, run:
     ```
