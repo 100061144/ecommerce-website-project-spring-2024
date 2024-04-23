@@ -27,7 +27,7 @@ This is an e-commerce website built using React.js for the frontend and Node.js 
 
 ## Getting Started
 
-To run this project locally, follow these steps:
+To run this project locally, follow these steps in CMD/Terminal:
 
 1. Clone the repository:
 git clone https://github.com/100061144/ecommerce-website.git
@@ -36,7 +36,9 @@ git clone https://github.com/100061144/ecommerce-website.git
 cd ecommerce-website
 
 3. Install the dependencies for both the frontend and backend:
+```
 cd client npm install cd ../server npm install
+```
 
 4. Start the development servers:
    - In the `server` directory, run:
