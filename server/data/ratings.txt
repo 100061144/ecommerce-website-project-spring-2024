@@ -40,3 +40,4 @@ mark.brown	101-003	Black Kandoora	5
 ava.carter	101-003	Black Kandoora	4
 liam.miller	101-003	Black Kandoora	3
 alex.jones	101-003	Black Kandoora	4
+100060637	103-013	(Kids) Black Abaya	4

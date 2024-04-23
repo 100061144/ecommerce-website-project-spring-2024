@@ -152,6 +152,10 @@ const AdminDashboard = () => {
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
+    if (!file) {
+      alert('Please add an image for the product.');
+      return; // Stop the function if no file is selected
+    }
     const newProduct = {
       id: e.target.id.value,
       name: e.target.name.value,
@@ -162,13 +166,7 @@ const AdminDashboard = () => {
 
     const formData = new FormData();
     formData.append('product', JSON.stringify(newProduct));
-    if (file) {
-        console.log(file); // Add this right before appending the file to FormData
-        formData.append('image', file); // Make sure 'image' matches the key expected by Multer
-    } else {
-        alert('Please select an image to upload.');
-        return; // Exit the function if no file is selected
-    }
+    formData.append('image', file); // Append the file to FormData
 
     try {
       const response = await fetch('http://localhost:3000/addProduct', {

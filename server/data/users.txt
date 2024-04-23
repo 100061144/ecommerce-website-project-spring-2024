@@ -22,3 +22,5 @@ jacob.ward	jwpassword	jacob.ward@example.com	0501234584	Jacob	Ward
 ava.carter	acpassword	ava.carter@example.com	0501234585	Ava	Carter
 ethan.lee	elpassword	ethan.lee@example.com	0501234586	Ethan	Lee
 isabella.wilson	iwpassword	isabella.wilson@example.com	0501234587	Isabella	Wilson
+test	test	test@test.com	0501234567	test	test
+test2	test2	test2@test.com	0501234567	test	test

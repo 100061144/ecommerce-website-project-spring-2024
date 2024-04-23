@@ -490,6 +490,24 @@ app.post('/updateProfile', async (req, res) => {
     res.json(result);
 });
 
+// USER CHECK USERNAME
+app.post('/checkUsername', async (req, res) => {
+    const { username, originalUsername } = req.body;
+    const filePath = path.join(__dirname, 'data', 'users.txt');
+    try {
+        const data = await readFile(filePath, 'utf8');
+        const usernames = data.split('\n').map(line => line.split('\t')[0]);
+        if (username !== originalUsername && usernames.includes(username)) {
+            res.json({ success: false, message: "Username already exists." });
+        } else {
+            res.json({ success: true });
+        }
+    } catch (error) {
+        console.error("Error checking username:", error);
+        res.status(500).json({ success: false, message: "Server error while checking username." });
+    }
+});
+
 // USER DELETE ACCOUNT
 app.delete('/deleteAccount', async (req, res) => {
     const { username } = req.body; // Username is sent in the request body
