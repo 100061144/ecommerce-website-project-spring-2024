@@ -46,7 +46,7 @@ A dark maroon sheila for women.
 102-013	Dark Mustard Sheila	120	8
 A dark mustard sheila for women.
 
-103-001	(Kids) White Kandoora	170	4
+103-001	(Kids) White Kandoora	170	3
 A white kids kandoora.
 
 103-002	(Kids) Navy Blue Kandoora	170	3

@@ -157,68 +157,76 @@ async function addItemToCart(username, item) {
 
 async function createNewOrder(username, fullAddress) {
     try {
-    // Read the user's cart
-    const cartFilePath = getUserCartFilePath(username);
-    const cartContents = await readFile(cartFilePath, 'utf8');
-    const cartLines = cartContents.trim().split('\n').slice(1); // Skip the first line containing the username
+        // Read the user's cart
+        const cartFilePath = getUserCartFilePath(username);
+        const cartContents = await readFile(cartFilePath, 'utf8');
+        const cartLines = cartContents.trim().split('\n').slice(1); // Skip the first line containing the username
 
-    if (cartLines.length === 0) {
-        return { success: false, message: "Cart is empty." };
-    }
-
-    // Calculate total price
-    let totalPrice = 0;
-    const productsWithQuantities = cartLines.map(line => {
-        const [id, , price, quantity] = line.split('\t');
-        totalPrice += parseFloat(price) * parseInt(quantity, 10);
-        return `${id}(${quantity})`; // Format: productID(quantity)
-    });
-
-    // Generate a new order ID
-    const ordersData = await readFile(ordersFilePath, 'utf8');
-    const orderLines = ordersData.trim().split('\n\n');
-    const lastOrderLine = orderLines[orderLines.length - 1].split('\n')[0];
-    const lastOrderId = lastOrderLine.split('\t')[0];
-    const orderIdNumber = lastOrderId.startsWith('201-') ? parseInt(lastOrderId.split('-')[1], 10) + 1 : 1;
-    const newOrderId = `201-${String(orderIdNumber).padStart(4, '0')}`;
-
-    // Format the new order
-    const today = new Date();
-    const formattedDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-
-    const newOrder = `${newOrderId}\t${username}\t${formattedDate}\t${totalPrice}\tPending\t${fullAddress}\n${productsWithQuantities.join('\t')}\n`;
-
-    const productsData = await readFile(productsFilePath, 'utf8');
-    const productBlocks = productsData.trim().split(/\r?\n\r?\n/);
-    const updatedProductBlocks = productBlocks.map(block => {
-        const lines = block.split(/\r?\n/);
-        const [id, name, price, quantity] = lines[0].split('\t');
-        const description = lines.slice(1).join(' ');
-
-        // Check if the product is in the order
-        const orderedProduct = productsWithQuantities.find(product => product.startsWith(id));
-        if (orderedProduct) {
-            const [, orderedQuantity] = orderedProduct.split('(');
-            const newQuantity = parseInt(quantity, 10) - parseInt(orderedQuantity, 10);
-            return `${id}\t${name}\t${price}\t${newQuantity}\n${description}`;
+        if (cartLines.length === 0) {
+            return { success: false, message: "Cart is empty." };
         }
 
-        return block;
-    });
+        // Calculate total price
+        let totalPrice = 0;
+        const productsWithQuantities = cartLines.map(line => {
+            const [id, , price, quantity] = line.split('\t');
+            totalPrice += parseFloat(price) * parseInt(quantity, 10);
+            return `${id}(${quantity})`; // Format: productID(quantity)
+        });
 
-    await writeFile(productsFilePath, updatedProductBlocks.join('\n\n'), 'utf8');
+        // Generate a new order ID
+        const ordersData = await readFile(ordersFilePath, 'utf8');
+        const orderLines = ordersData.trim().split('\n\n');
+        const lastOrderLine = orderLines[orderLines.length - 1].split('\n')[0];
+        const lastOrderId = lastOrderLine.split('\t')[0];
+        const orderIdNumber = lastOrderId.startsWith('201-') ? parseInt(lastOrderId.split('-')[1], 10) + 1 : 1;
+        const newOrderId = `201-${String(orderIdNumber).padStart(4, '0')}`;
 
-    // Append the new order to orders.txt
-    await appendFile(ordersFilePath, `\n${newOrder}`);
+        // Format the new order
+        const today = new Date();
+        const formattedDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
 
-    // Clear the user's cart
-    await writeFile(cartFilePath, `${username}\n`);
+        const newOrder = `${newOrderId}\t${username}\t${formattedDate}\t${totalPrice}\tPending\t${fullAddress}\n${productsWithQuantities.join('\t')}\n`;
 
-    return { success: true, message: "Order created successfully.", orderID: newOrderId, orderDate: formattedDate, totalPrice };
+        const productsData = await readFile(productsFilePath, 'utf8');
+        const productBlocks = productsData.split(/\r?\n\r?\n/);
+        const updatedProductBlocks = productBlocks.map(block => {
+            const lines = block.split(/\r?\n/);
+            const [id, name, price, quantity] = lines[0].split('\t');
+            const description = lines.slice(1).join(' ');
+
+            // Check if the product is in the order
+            const orderedProduct = productsWithQuantities.find(product => product.startsWith(id));
+            if (orderedProduct) {
+                const [, orderedQuantity] = orderedProduct.split('(');
+                const newQuantity = parseInt(quantity, 10) - parseInt(orderedQuantity, 10);
+                return `${id}\t${name}\t${price}\t${newQuantity}\n${description}`;
+            }
+
+            return block;
+        });
+
+        // Determine if the original data ended with a newline
+        const shouldEndWithNewline = productsData.endsWith('\n');
+
+        let finalData = updatedProductBlocks.join('\n\n');
+        if (shouldEndWithNewline && !finalData.endsWith('\n')) {
+            finalData += '\n'; // Ensure the final data ends with a newline if the original did
+        }
+
+        await writeFile(productsFilePath, finalData, 'utf8');
+
+        // Append the new order to orders.txt
+        await appendFile(ordersFilePath, `\n${newOrder}`);
+
+        // Clear the user's cart
+        await writeFile(cartFilePath, `${username}\n`);
+
+        return { success: true, message: "Order created successfully.", orderID: newOrderId, orderDate: formattedDate, totalPrice };
 
     } catch (error) {
-    console.error("Error creating new order:", error);
-    return { success: false, message: "Error creating new order." };
+        console.error("Error creating new order:", error);
+        return { success: false, message: "Error creating new order." };
     }
 }
 
@@ -900,7 +908,7 @@ app.post('/updateOrderStatus', async (req, res) => {
     const { orderID, newStatus } = req.body;
     try {
         let ordersData = await fs.promises.readFile(path.join(__dirname, 'data', 'orders.txt'), 'utf8');
-        let orders = ordersData.trim().split('\n\n');
+        let orders = ordersData.split('\n\n').map(order => order.trim()); // Split and trim each order block
         let updated = false;
         let currentStatus = ""; // Variable to hold the current status before update
         let username, orderDate, totalPrice, address;
@@ -916,13 +924,20 @@ app.post('/updateOrderStatus', async (req, res) => {
                 address = orderDetails.slice(5).join(' '); // Address is stored from the 6th element onwards
                 orderDetails[4] = newStatus; // Update the status
                 updated = true;
-                return `${orderDetails.join('\t')}\n${lines[1]}`;
+                return `${orderDetails.join('\t')}\n${lines[1]}`; // Construct the updated order block
             }
-            return orderBlock;
+            return orderBlock; // Return the original order block if not updated
         });
 
+        // Determine if the original data ended with a newline
+        const shouldEndWithNewline = ordersData.endsWith('\n');
+
         if (updated) {
-            await fs.promises.writeFile(path.join(__dirname, 'data', 'orders.txt'), updatedOrders.join('\n\n'), 'utf8');
+            let finalData = updatedOrders.join('\n\n');
+            if (shouldEndWithNewline) {
+                finalData += '\n'; // Ensure the final data ends with a newline if the original did
+            }
+            await fs.promises.writeFile(path.join(__dirname, 'data', 'orders.txt'), finalData, 'utf8');
             // Check if the status has been updated to "Shipped" or "Delivered" and currentStatus is not the same as newStatus
             if ((newStatus === "Shipped" || newStatus === "Delivered") && currentStatus !== newStatus) {
                 await sendOrderStatusEmail(username, orderID, orderDate, totalPrice, address, newStatus);

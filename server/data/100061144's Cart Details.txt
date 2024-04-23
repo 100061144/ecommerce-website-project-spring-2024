@@ -1,5 +1,0 @@
-100061144
-101-001	White Kandoora	200	2
-101-011	White Ghutra	50	1
-101-021	Black Agal	60	1
-101-031	White Sandal	350	9
