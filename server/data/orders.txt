@@ -1,4 +1,4 @@
-201-0001	100061144	2024-3-15	810	Delivered	Khalifa Residential Complex B, Abu Dhabi, United Arab Emirates
+201-0001	100061144	2024-3-15	810	Delivered	Al Zahiyah, Abu Dhabi, United Arab Emirates
 101-001(1)	101-002(1)	103-002(1)	103-012(1)
 
 201-0002	100060009	2024-2-13	300	Delivered	Jumeirah, Dubai, United Arab Emirates

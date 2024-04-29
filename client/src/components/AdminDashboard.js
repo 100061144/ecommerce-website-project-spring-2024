@@ -461,7 +461,7 @@ const AdminDashboard = () => {
                     )}
                     {analytics.worstRatedProduct && (
                         <p>
-                            <strong>Worst Rated Product:</strong> {analytics.worstRatedProduct.productName} ({analytics.worstRatedProduct.productId}) - Average Rating: {analytics.worstRatedProduct.averageRating})
+                            <strong>Worst Rated Product:</strong> {analytics.worstRatedProduct.productName} ({analytics.worstRatedProduct.productId}) - Average Rating: {analytics.worstRatedProduct.averageRating}
                         </p>
                     )}
                 </>
