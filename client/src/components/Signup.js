@@ -15,6 +15,10 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  const handleBack = () => {
+    navigate('/login');
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserDetails(prevDetails => ({
@@ -83,6 +87,7 @@ const Signup = () => {
         <input type="text" name="firstName" value={userDetails.firstName} onChange={handleChange} placeholder="First Name" required />
         <input type="text" name="lastName" value={userDetails.lastName} onChange={handleChange} placeholder="Last Name" required />
         <button type="submit" className="signup-button">Sign Up</button>
+        <button type="button" onClick={handleBack} className="back-button">Back to Login</button>
       </form>
     </div>
   );

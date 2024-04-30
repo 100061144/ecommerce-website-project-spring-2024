@@ -21,6 +21,7 @@ const Login = () => {
       if (data.success) {
         // Store user information in localStorage
         localStorage.setItem('username', data.username);
+        localStorage.setItem('password', password);
         localStorage.setItem('email', data.email);
         localStorage.setItem('phoneNumber', data.phoneNumber);
         localStorage.setItem('firstName', data.firstName);
