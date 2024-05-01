@@ -7,6 +7,9 @@ A navy-blue qatari-style kandoora.
 101-003	Black Kandoora	200	5
 A black kuwaiti-style kandoora.
 
+101-004	Yellow Mustard Kandoora	220	12
+a yellow mustard kandoora for men
+
 101-011	White Ghutra	50	7
 A plain ghutra for men.
 
@@ -52,7 +55,7 @@ A white kids kandoora.
 103-002	(Kids) Navy Blue Kandoora	170	3
 A navy blue kandoora.
 
-103-003	(Kids) Yellow Kandoora	170	6
+103-003	(Kids) Yellow Kandoora	200	6
 A yellow kids kandoora.
 
 103-011	(Kids) Patterned Abaya	170	7

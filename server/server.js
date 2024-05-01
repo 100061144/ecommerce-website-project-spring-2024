@@ -677,7 +677,7 @@ app.get('/orders/:username', async (req, res) => {
         }, {});
 
         // Filter and map orders for the given username, now including the address and parsing product quantities
-        const orders = ordersData.trim().split('\n\n').map(block => {
+        const orders = ordersData.trim().split(/\r?\n\r?\n/).map(block => {
             const lines = block.split('\n');
             const orderDetails = lines[0].split('\t');
             const orderID = orderDetails[0];
@@ -714,7 +714,7 @@ app.get('/analytics', async (req, res) => {
         const ratingsData = await readFile(ratingsFilePath, 'utf8');
 
         // Splitting the data into lines and then processing
-        const ordersLines = ordersData.trim().split('\n\n');
+        const ordersLines = ordersData.trim().split(/\r?\n\r?\n/);
         const productLines = productsData.trim().split('\n\n');
 
         // Creating a map of product IDs to product names and quantities
@@ -902,7 +902,7 @@ app.get('/orders', async (req, res) => {
 
         // Read orders
         const ordersData = await fs.promises.readFile(path.join(__dirname, 'data', 'orders.txt'), 'utf8');
-        const orders = ordersData.trim().split('\n\n').map(orderBlock => {
+        const orders = ordersData.trim().split(/\r?\n\r?\n/).map(orderBlock => {
             const lines = orderBlock.split('\n');
             const [orderID, username, orderDate, totalPrice, status, ...addressParts] = lines[0].split('\t');
             const address = addressParts.join(' ');

@@ -1,11 +1,11 @@
 201-0001	100061144	2024-3-15	810	Delivered	Al Zahiyah, Abu Dhabi, United Arab Emirates
 101-001(1)	101-002(1)	103-002(1)	103-012(1)
 
-201-0002	100060009	2024-2-13	300	Delivered	Jumeirah, Dubai, United Arab Emirates
-103-001(2)	101-003(3)	102-001(1)	101-011(4)
+201-0002	100060637	2024-4-30	600	Pending	khalifa city a, abu dhabi, united arab emirates
+101-001(1)	101-012(1)	101-032(1)
 
-201-0003	100060637	2024-2-13	300	Delivered	Khalifa City A, Abu Dhabi, United Arab Emirates
-103-001(2)	101-001(3)	102-001(1)	101-011(4)
+201-0003	100060009	2024-2-13	300	Delivered	Jumeirah, Dubai, United Arab Emirates
+103-001(2)	101-003(3)	102-001(1)	101-011(4)
 
 201-0004	john.doe13	2024-1-20	450	Pending	123 Elm Street, Springfield, USA
 101-001(2)	101-003(2)	102-001(1)
@@ -24,9 +24,6 @@
 
 201-0009	jane.doe	2024-2-01	400	Shipped	303 Cedar Street, Springfield, USA
 101-001(1)	101-012(2)	102-001(1)
-
-201-0010	100060637	2024-2-03	500	Shipped	Khalifa City A, Abu Dhabi, United Arab Emirates
-101-031(1)	102-011(1)	103-011(1)
 
 201-0011	lisa.white	2024-2-05	350	Pending	505 Redwood Street, Springfield, USA
 101-021(1)	102-012(1)	103-001(1)
