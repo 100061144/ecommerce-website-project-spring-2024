@@ -65,6 +65,7 @@ cd client npm install cd ../server npm install
   - `public/`: Public assets and HTML template.
 
 - `server/`: Contains the Node.js backend code.
+  - `data/`: Main .txt files database.
   - `routes/`: API route definitions.
   - `app.js`: Express application setup.
   - `server.js`: Server entry point.
